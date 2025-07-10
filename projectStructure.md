@@ -1,34 +1,49 @@
 legatia/
-├── README.md
-├── .gitignore
-├── frontend/                    # React d-webapp
-│   ├── public/
+├── frontend/
+│   ├── public/                       # Static assets (icons, images, fonts)
 │   ├── src/
-│   │   ├── assets/              # Logo, icons, static images
-│   │   ├── components/          # Reusable UI components (e.g., PersonCard, TreeViewer)
-│   │   ├── pages/               # Page-level views (Home, Dashboard, TreeView)
-│   │   ├── services/            # Canister agent, auth, utils
-│   │   ├── types/               # Shared TypeScript types (mirrors backend)
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── vite.config.ts           # or webpack.config.js
+│   │   ├── assets/                  # Profile images, illustrations, etc.
+│   │   ├── components/              # Reusable UI components (Card, Button, Form, etc.)
+│   │   ├── pages/                   # Route-level components (e.g., Home, Profile, Family)
+│   │   ├── features/
+│   │   │   ├── auth/                # Internet Identity login / session
+│   │   │   ├── profile/             # Profile creation & editing
+│   │   │   ├── family/              # Family tree views, admin functions
+│   │   │   ├── relationships/       # Relationship linking + invite logic
+│   │   │   ├── invites/             # One-time invitation code system
+│   │   ├── services/                # Canister API integration (Candid interfaces)
+│   │   ├── types/                   # Global TypeScript types (Profile, Family, etc.)
+│   │   ├── utils/                   # Formatters, validators, etc.
+│   │   └── App.tsx
 │   └── package.json
 │
-├── backend/                     # Python CDK canister
-│   ├── src/
-│   │   ├── legatia_backend/
-│   │   │   ├── __init__.py
-│   │   │   ├── main.py          # Canister logic (add_person, get_tree, etc.)
-│   │   │   └── models.py        # Person, FamilyTree, etc.
-│   │   └── legatia_backend.did  # Candid interface
-│   └── requirements.txt
+├── backend/
+│   ├── canisters/
+│   │   ├── profiles/
+│   │   │   └── main.py              # CRUD logic for user profiles
+│   │   ├── families/
+│   │   │   └── main.py              # Family creation, admin logic, member listing
+│   │   ├── relationships/
+│   │   │   └── main.py              # Relationship linking, validation, confirmation
+│   │   ├── invites/
+│   │   │   └── main.py              # One-time invite code generation & claim flow
+│   │   └── __init__.py
+│   ├── candid/
+│   │   ├── profiles.did
+│   │   ├── families.did
+│   │   ├── relationships.did
+│   │   └── invites.did
+│   └── requirements.txt             # For Python CDK dependencies
 │
-├── candid/                      # Shared generated TypeScript bindings
-│   └── legatia_backend.did.js
+├── docs/
+│   ├── architecture.md              # High-level structure
+│   ├── data-model.md                # Profiles, families, relationships schema
+│   └── roadmap.md                   # Milestones and deliverables
 │
-├── dfx.json                     # Canister + deployment config
-├── tsconfig.json
-├── package.json
-└── scripts/
-    ├── deploy.sh                # Local dev deploy script
-    └── build.sh                 # Optional build script
+├── tests/
+│   ├── frontend/                    # Cypress / React Testing Library
+│   └── backend/                     # Pytest or other CDK-compatible tests
+│
+├── dfx.json                         # ICP project config
+├── README.md
+└── LICENSE
