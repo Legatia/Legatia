@@ -20,7 +20,8 @@
 
 ## 🧱 Tech Stack
 
-- **Frontend**: React (Next.js optional)
+- **Frontend**: React 
+- **Mobile**: React Native(later stage)
 - **Backend**: Internet Computer Canisters via Python CDK
 - **Authentication**: Internet Identity (WebAuthn / Passkey)
 - **Persistence**: Fully on-chain storage (no external DB)
@@ -40,7 +41,7 @@
 ### Local Setup
 
 ```bash
-git clone https://github.com/your-org/legatia.git
+git clone https://github.com/legatia/legatia.git
 cd legatia
 dfx start --background
 dfx deploy
