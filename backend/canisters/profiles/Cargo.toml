@@ -1,0 +1,18 @@
+[package]
+name = "profiles"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+tokio = { version = "1", features = ["macros", "time"] }
+ic-cdk = "0.18.5"
+ic-cdk-macros = "0.18.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_bytes = "0.11"
+serde_cbor = "0.11"
+candid = "0.10.13"
+rand = "0.8"
+
+[lib]
+crate-type = ["cdylib"] # Required for compiling to WebAssembly
