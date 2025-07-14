@@ -22,7 +22,7 @@
 
 - **Frontend**: React 
 - **Mobile**: React Native(later stage)
-- **Backend**: Internet Computer Canisters via Python CDK
+- **Backend**: Internet Computer Canisters via Rust
 - **Authentication**: Internet Identity (WebAuthn / Passkey)
 - **Persistence**: Fully on-chain storage (no external DB)
 - **Tokenomics**: Planned canister-integrated utility token for advanced features
