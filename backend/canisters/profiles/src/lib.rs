@@ -1,16 +1,17 @@
-use candid::{CandidType, Deserialize};
+use candid::{CandidType, Deserialize, Principal};
 use ic_cdk::{init, query, update};
-use rand::{distributions::Alphanumeric, Rng, thread_rng};
+use ic_cdk::api::management_canister::raw_rand;
+use ic_cdk::call::Call;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-#[derive(CandidType, Deserialize, Clone)]
-struct Profile {
-    user_id: String,
-    name: String,
-    surname: String,
-    family_id: Option<String>,
-    email: String,
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct Profile {
+    pub user_id: String,
+    pub name: String,
+    pub surname: String,
+    pub family_id: Option<String>,
+    pub email: String,
 }
 
 thread_local! {
@@ -20,54 +21,76 @@ thread_local! {
 #[init]
 fn init() {}
 
-// Note: This function generates a unique ID by checking against the PROFILES map.
-// Using it for both user_id and family_id might not be the intended logic,
-// as family_id uniqueness should likely be checked against a separate families map.
-fn generate_unique_id(length: usize) -> String {
-    let mut rng = thread_rng();
-    PROFILES.with(|profiles_ref| {
-        let profiles = profiles_ref.borrow();
-        loop {
-            let id: String = (&mut rng)
-                .sample_iter(&Alphanumeric)
-                .take(length)
-                .map(char::from)
-                .collect();
+async fn generate_unique_id(length: usize) -> String {
+    loop {
+        let id_bytes = raw_rand().await.expect("Failed to get random bytes").0;
+        let hex_string: String = id_bytes.iter()
+            .map(|b| format!("{:02x}", b))
+            .collect();
+        let id: String = hex_string.chars().take(length).collect();
 
-            if !profiles.contains_key(&id) {
-                return id;
-            }
+        let is_unique = PROFILES.with(|profiles_ref| {
+            let profiles = profiles_ref.borrow();
+            !profiles.contains_key(&id)
+        });
+
+        if is_unique {
+            return id;
         }
-    })
+    }
 }
 
 #[update]
-fn create_profile(name: String, surname: String, email: String, is_family_creator: bool) -> Profile {
-    let user_id = generate_unique_id(10);
-    
-    let family_id = if is_family_creator {
-        Some(generate_unique_id(7))
+pub async fn create_profile(name: String, surname: String, email: String, family_id: Option<String>, invite_code: Option<String>) -> Result<Profile, String> {
+    let user_id = generate_unique_id(10).await;
+
+    if let (Some(fam_id), Some(code)) = (family_id.clone(), invite_code) {
+        // Joining an existing family
+        let families_canister_id = Principal::from_text("YOUR_FAMILIES_CANISTER_ID").expect("Invalid principal");
+        let response = Call::unbounded_wait(families_canister_id, "add_member_to_family").with_arg((user_id.clone(), fam_id.clone(), code)).await.map_err(|e| format!("Failed to call families canister: {:?}", e))?;
+        let (result,): (Result<(), String>,) = response.reply().await.map_err(|e| format!("Failed to get reply from families canister: {:?}", e))?;
+
+        if let Err(e) = result {
+            return Err(e);
+        }
+        let profile = Profile {
+            user_id: user_id.clone(),
+            name,
+            surname,
+            email,
+            family_id: Some(fam_id),
+        };
+        PROFILES.with(|profiles_ref| {
+            profiles_ref.borrow_mut().insert(user_id, profile.clone());
+        });
+        Ok(profile)
     } else {
-        None
-    };
+        // Creating a new family
+        let new_family_id = generate_unique_id(7).await;
 
-    let profile = Profile {
-        user_id: user_id.clone(),
-        name,
-        surname,
-        email,
-        family_id,
-    };
+        let families_canister_id = Principal::from_text("YOUR_FAMILIES_CANISTER_ID").expect("Invalid principal");
+        let response = Call::unbounded_wait(families_canister_id, "create_family").with_arg((user_id.clone(), format!("{} Family", surname))).await.map_err(|e| format!("Failed to call families canister: {:?}", e))?;
+        let (result,): (Result<String, String>,) = response.reply().await.map_err(|e| format!("Failed to get reply from families canister: {:?}", e))?;
 
-    PROFILES.with(|profiles_ref| {
-        profiles_ref.borrow_mut().insert(user_id, profile.clone());
-    });
-
-    profile
+        if let Err(e) = result {
+            return Err(e);
+        }
+        let profile = Profile {
+            user_id: user_id.clone(),
+            name,
+            surname,
+            email,
+            family_id: Some(new_family_id.clone()),
+        };
+        PROFILES.with(|profiles_ref| {
+            profiles_ref.borrow_mut().insert(user_id, profile.clone());
+        });
+        Ok(profile)
+    }
 }
 
 #[query]
-fn get_profile(user_id: String) -> Option<Profile> {
+pub fn get_profile(user_id: String) -> Option<Profile> {
     PROFILES.with(|profiles_ref| {
         profiles_ref.borrow().get(&user_id).cloned()
     })

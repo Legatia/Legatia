@@ -236,6 +236,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
+name = "families"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "getrandom",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "rand",
+ "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "tokio",
+]
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -536,6 +551,7 @@ name = "profiles"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "families",
  "getrandom",
  "ic-cdk",
  "ic-cdk-macros",

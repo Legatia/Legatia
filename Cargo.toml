@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "backend/canisters/profiles",
+    "backend/canisters/families",
+    "backend/canisters/invites",
+    "backend/canisters/relationships",
+]

@@ -1,0 +1,12 @@
+type Profile = record {
+  user_id: text;
+  name: text;
+  surname: text;
+  family_id: opt text;
+  email: text;
+};
+
+service: {
+  create_profile: (text, text, text, opt text, opt text) -> (variant { Ok: Profile; Err: text });
+  get_profile: (text) -> (opt Profile);
+}

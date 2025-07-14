@@ -1,0 +1,12 @@
+type Invite = record {
+  code: text;
+  family_id: text;
+  creator_id: text;
+  is_used: bool;
+};
+
+service: {
+  create_invite: (text, text) -> (variant { Ok: text; Err: text });
+  get_invite: (text) -> (opt Invite);
+  use_invite: (text) -> (variant { Ok: text; Err: text });
+}

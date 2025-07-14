@@ -1,0 +1,12 @@
+type Family = record {
+  family_id: text;
+  creator_id: text;
+  name: text;
+  members: vec text;
+};
+
+service: {
+  create_family: (text, text) -> (variant { Ok: text; Err: text });
+  add_member_to_family: (text, text, text) -> (variant { Ok; Err: text });
+  get_family: (text) -> (opt Family);
+}

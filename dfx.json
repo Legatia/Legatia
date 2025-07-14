@@ -3,28 +3,30 @@
     "profiles": {
       "type": "rust",
       "candid": "backend/canisters/profiles/profiles.did",
-	  "package": "profiles",
-      "wasm": "backend/canisters/profiles/target/wasm32-unknown-unknown/release/profiles.wasm",
-      "build": "cargo build --target wasm32-unknown-unknown --release --manifest-path backend/canisters/profiles/Cargo.toml"
+      "package": "profiles"
     },
-	"families": {
-	   "type": "rust",
-	   "candid": "backend/canisters/families/families.did",
-	   "package": "families",
-	   "main": "backend/canisters/src/lib.rs",
-	   "wasm": "backend/canisters/profiles/target/wasm32-unknown-unknown/release/families.wasm",
-	   "build": "cargo build --target wasm32-unknown-unknown --release --manifest-path backend/canisters/families/Cargo.toml"
-	}
+    "families": {
+      "type": "rust",
+      "candid": "backend/canisters/families/families.did",
+      "package": "families"
+    },
+    "invites": {
+      "type": "rust",
+      "candid": "backend/canisters/invites/invites.did",
+      "package": "invites"
+    }
   },
   "defaults": {
     "build": {
-      "packtool": ""
+      "packtool": "",
+      "args": "",
+      "cmd": "cargo build --target wasm32-unknown-unknown --release"
     }
   },
   "dfx": "0.17.0",
   "networks": {
     "local": {
-      "bind": "127.0.0.1:4943",
+      "bind": "127.0.0.1:4944",
       "type": "ephemeral"
     }
   }
