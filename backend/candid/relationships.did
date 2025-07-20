@@ -15,5 +15,7 @@ type Relationship = record {
 
 service : {
   add_relationship: (principal, RelationshipType, opt text) -> (variant { Ok; Err: text });
+  remove_relationship: (principal, RelationshipType) -> (variant { Ok; Err: text });
+  update_relationship: (principal, RelationshipType, RelationshipType, opt text) -> (variant { Ok; Err: text });
   get_relationships_for_user: (principal) -> (vec Relationship);
 }

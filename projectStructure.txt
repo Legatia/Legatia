@@ -21,19 +21,19 @@ legatia/
 │   ├── canisters/
 │   │   ├── profiles/
 │   │   │   ├── src/
-│   │   │   │   └── main.rs          # CRUD logic for user profiles
+│   │   │   │   └── lib.rs          # CRUD logic for user profiles (Rust)
 │   │   │   └── Cargo.toml
 │   │   ├── families/
 │   │   │   ├── src/
-│   │   │   │   └── main.rs          # Family creation, admin logic, member listing
+│   │   │   │   └── lib.rs          # Family creation, admin logic, member listing (Rust)
 │   │   │   └── Cargo.toml
 │   │   ├── relationships/
 │   │   │   ├── src/
-│   │   │   │   └── main.rs          # Relationship linking, validation, confirmation
+│   │   │   │   └── lib.rs          # Relationship linking, validation, confirmation (Rust)
 │   │   │   └── Cargo.toml
 │   │   ├── invites/
 │   │   │   ├── src/
-│   │   │   │   └── main.rs          # One-time invite code generation & claim flow
+│   │   │   │   └── lib.rs          # One-time invite code generation & claim flow (Rust)
 │   │   │   └── Cargo.toml
 │   ├── candid/
 │   │   ├── profiles.did

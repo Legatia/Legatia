@@ -1,3 +1,4 @@
+
 use candid::{CandidType, Principal};
 use ic_cdk::{api::caller, update, query};
 use rand::Rng;
@@ -61,4 +62,33 @@ fn claim_invite(code: String) -> Result<(Principal, Option<u64>), String> {
 
     invite.claimed = true;
     Ok((invite.inviter, invite.inviter_family_id))
+}
+
+#[update]
+fn revoke_invite(code: String) -> Result<(), String> {
+    let caller = caller();
+    let invite_store = ic_cdk::storage::get_mut::<InviteStore>();
+
+    let invite = invite_store
+        .get(&code)
+        .ok_or_else(|| "Invite not found".to_string())?;
+
+    if invite.inviter != caller {
+        return Err("Unauthorized: Only the inviter can revoke this code".to_string());
+    }
+
+    invite_store.remove(&code);
+    Ok(())
+}
+
+#[query]
+fn list_invites() -> Vec<String> {
+    let caller = caller();
+    let invite_store = ic_cdk::storage::get::<InviteStore>();
+
+    invite_store
+        .iter()
+        .filter(|(_, invite)| invite.inviter == caller && !invite.claimed)
+        .map(|(code, _)| code.clone())
+        .collect()
 }

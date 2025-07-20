@@ -8,4 +8,6 @@ service : {
   generate_invite: (opt nat64) -> (text);
   get_invite: (text) -> (variant { Ok: Invite; Err: text });
   claim_invite: (text) -> (variant { Ok: record { principal; opt nat64 }; Err: text });
+  revoke_invite: (text) -> (variant { Ok; Err: text });
+  list_invites: () -> (vec text);
 }

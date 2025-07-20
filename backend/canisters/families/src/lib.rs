@@ -1,8 +1,17 @@
-
 use candid::{CandidType, Principal};
 use ic_cdk::{api::caller, update, query};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+
+// Define Profile struct for cross-canister call
+#[derive(Clone, Debug, Default, CandidType, Serialize, Deserialize)]
+struct Profile {
+    name: String,
+    sex: String,
+    birthday: String,
+    birthplace: String,
+    photo: Vec<u8>,
+}
 
 #[derive(Clone, Debug, CandidType, Serialize, Deserialize)]
 struct Member {
@@ -133,7 +142,7 @@ fn add_ghost_member(family_id: u64, name: String, birthday: String) -> Result<u6
 }
 
 #[update]
-fn claim_ghost_profile(family_id: u64, name: String, birthday: String) -> Result<(), String> {
+async fn claim_ghost_profile(family_id: u64, name: String, birthday: String) -> Result<(), String> {
     let caller = caller();
     let family_store = ic_cdk::storage::get_mut::<FamilyStore>();
     let family = family_store
@@ -149,15 +158,45 @@ fn claim_ghost_profile(family_id: u64, name: String, birthday: String) -> Result
     }
 
     if let Some(ghost_id) = ghost_to_claim {
-        family.ghost_members.remove(&ghost_id);
-        family.members.insert(
-            caller,
-            Member {
-                principal: caller,
-                is_admin: false,
-            },
-        );
-        Ok(())
+        let ghost_member = family.ghost_members.remove(&ghost_id).unwrap();
+
+        // Construct a Profile from the ghost data
+        let ghost_profile_data = Profile {
+            name: ghost_member.name,
+            sex: "Unknown".to_string(), // Default value, can be updated by user later
+            birthday: ghost_member.birthday,
+            birthplace: "Unknown".to_string(), // Default value
+            photo: Vec::new(), // Default empty photo
+        };
+
+        // Make cross-canister call to profiles canister
+        let profiles_canister_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai") // Placeholder ID
+            .expect("Could not decode profiles canister ID");
+
+        let call_result: Result<(Result<(), String>,), _> = ic_cdk::call(
+            profiles_canister_id,
+            "update_profile_from_ghost",
+            (caller, ghost_profile_data),
+        )
+        .await;
+
+        match call_result {
+            Ok((res,)) => {
+                if res.is_ok() {
+                    family.members.insert(
+                        caller,
+                        Member {
+                            principal: caller,
+                            is_admin: false,
+                        },
+                    );
+                    Ok(())
+                } else {
+                    Err(format!("Failed to update profile from ghost: {}", res.unwrap_err()))
+                }
+            }
+            Err((code, msg)) => Err(format!("Cross-canister call failed: {:?} {}", code, msg)),
+        }
     } else {
         Err("No matching ghost profile found".to_string())
     }
