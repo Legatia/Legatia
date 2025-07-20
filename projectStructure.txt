@@ -20,20 +20,26 @@ legatia/
 ├── backend/
 │   ├── canisters/
 │   │   ├── profiles/
-│   │   │   └── main.py              # CRUD logic for user profiles
+│   │   │   ├── src/
+│   │   │   │   └── main.rs          # CRUD logic for user profiles
+│   │   │   └── Cargo.toml
 │   │   ├── families/
-│   │   │   └── main.py              # Family creation, admin logic, member listing
+│   │   │   ├── src/
+│   │   │   │   └── main.rs          # Family creation, admin logic, member listing
+│   │   │   └── Cargo.toml
 │   │   ├── relationships/
-│   │   │   └── main.py              # Relationship linking, validation, confirmation
+│   │   │   ├── src/
+│   │   │   │   └── main.rs          # Relationship linking, validation, confirmation
+│   │   │   └── Cargo.toml
 │   │   ├── invites/
-│   │   │   └── main.py              # One-time invite code generation & claim flow
-│   │   └── __init__.py
+│   │   │   ├── src/
+│   │   │   │   └── main.rs          # One-time invite code generation & claim flow
+│   │   │   └── Cargo.toml
 │   ├── candid/
 │   │   ├── profiles.did
 │   │   ├── families.did
 │   │   ├── relationships.did
 │   │   └── invites.did
-│   └── requirements.txt             # For Python CDK dependencies
 │
 ├── docs/
 │   ├── architecture.md              # High-level structure

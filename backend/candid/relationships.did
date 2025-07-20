@@ -1,0 +1,6 @@
+service : {
+  "create_relationship": (text) -> (text);
+  "read_relationship": (text) -> (text);
+  "update_relationship": (text) -> (text);
+  "delete_relationship": (text) -> (text);
+}

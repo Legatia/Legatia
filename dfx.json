@@ -1,0 +1,40 @@
+{
+  "canisters": {
+    "profiles": {
+      "type": "custom",
+      "candid": "backend/candid/profiles.did",
+      "build": "cargo build --target wasm32-unknown-unknown --release -p profiles",
+      "wasm": "backend/canisters/profiles/target/wasm32-unknown-unknown/release/profiles.wasm"
+    },
+    "families": {
+      "type": "custom",
+      "candid": "backend/candid/families.did",
+      "build": "cargo build --target wasm32-unknown-unknown --release -p families",
+      "wasm": "backend/canisters/families/target/wasm32-unknown-unknown/release/families.wasm"
+    },
+    "relationships": {
+      "type": "custom",
+      "candid": "backend/candid/relationships.did",
+      "build": "cargo build --target wasm32-unknown-unknown --release -p relationships",
+      "wasm": "backend/canisters/relationships/target/wasm32-unknown-unknown/release/relationships.wasm"
+    },
+    "invites": {
+      "type": "custom",
+      "candid": "backend/candid/invites.did",
+      "build": "cargo build --target wasm32-unknown-unknown --release -p invites",
+      "wasm": "backend/canisters/invites/target/wasm32-unknown-unknown/release/invites.wasm"
+    },
+    "frontend": {
+      "type": "assets",
+      "source": [
+        "frontend/dist"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "vessel sources"
+    }
+  },
+  "version": 1
+}

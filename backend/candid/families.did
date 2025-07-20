@@ -1,0 +1,6 @@
+service : {
+  "create_family": (text) -> (text);
+  "read_family": (text) -> (text);
+  "update_family": (text) -> (text);
+  "delete_family": (text) -> (text);
+}

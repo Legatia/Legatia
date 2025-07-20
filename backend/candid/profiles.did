@@ -1,0 +1,6 @@
+service : {
+  "create_profile": (text) -> (text);
+  "read_profile": (text) -> (text);
+  "update_profile": (text) -> (text);
+  "delete_profile": (text) -> (text);
+}

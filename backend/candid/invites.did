@@ -1,0 +1,6 @@
+service : {
+  "create_invite": (text) -> (text);
+  "read_invite": (text) -> (text);
+  "update_invite": (text) -> (text);
+  "delete_invite": (text) -> (text);
+}
