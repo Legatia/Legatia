@@ -2,27 +2,27 @@
   "canisters": {
     "profiles": {
       "type": "custom",
-      "candid": "backend/candid/profiles.did",
-      "build": "cargo build --target wasm32-unknown-unknown --release -p profiles",
-      "wasm": "backend/canisters/profiles/target/wasm32-unknown-unknown/release/profiles.wasm"
+      "candid": "backend/src/profiles/profiles.did",
+      "wasm": "backend/target/wasm32-unknown-unknown/release/profiles.wasm",
+      "build": "cd backend && cargo build --target wasm32-unknown-unknown --release -p profiles"
     },
     "families": {
       "type": "custom",
-      "candid": "backend/candid/families.did",
-      "build": "cargo build --target wasm32-unknown-unknown --release -p families",
-      "wasm": "backend/canisters/families/target/wasm32-unknown-unknown/release/families.wasm"
+      "candid": "backend/src/families/families.did",
+      "wasm": "backend/target/wasm32-unknown-unknown/release/families.wasm",
+      "build": "cd backend && cargo build --target wasm32-unknown-unknown --release -p families"
     },
     "relationships": {
       "type": "custom",
-      "candid": "backend/candid/relationships.did",
-      "build": "cargo build --target wasm32-unknown-unknown --release -p relationships",
-      "wasm": "backend/canisters/relationships/target/wasm32-unknown-unknown/release/relationships.wasm"
+      "candid": "backend/src/relationships/relationships.did",
+      "wasm": "backend/target/wasm32-unknown-unknown/release/relationships.wasm",
+      "build": "cd backend && cargo build --target wasm32-unknown-unknown --release -p relationships"
     },
     "invites": {
       "type": "custom",
-      "candid": "backend/candid/invites.did",
-      "build": "cargo build --target wasm32-unknown-unknown --release -p invites",
-      "wasm": "backend/canisters/invites/target/wasm32-unknown-unknown/release/invites.wasm"
+      "candid": "backend/src/invites/invites.did",
+      "wasm": "backend/target/wasm32-unknown-unknown/release/invites.wasm",
+      "build": "cd backend && cargo build --target wasm32-unknown-unknown --release -p invites"
     },
     "frontend": {
       "type": "assets",
@@ -31,6 +31,11 @@
       ]
     }
   },
+  "meetadata": [
+    {
+      "name": "candid:service"
+    }
+  ],
   "defaults": {
     "build": {
       "packtool": "vessel sources"

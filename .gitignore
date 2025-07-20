@@ -1,9 +1,33 @@
-# Rust
-target/
+# DFX generated files
+.dfx/
+src/declarations/
 
-# Frontend
+# Rust build artifacts
+target/
+backend/target/
+
+# Node.js dependencies
+node_modules/
 frontend/node_modules/
+backend/node_modules/
+
+# Lock files
+package-lock.json
+yarn.lock
+npm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# Frontend build artifacts
 frontend/dist/
+
+# Internet Identity
+internet-identity/
 
 # macOS
 .DS_Store
+
+# Other common ignores
+*.wasm
+*.did

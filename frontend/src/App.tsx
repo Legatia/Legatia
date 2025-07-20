@@ -1,12 +1,27 @@
-import React from 'react';
+
+import { AuthProvider, useAuth } from './AuthContext';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <div className="App">
+      {isAuthenticated ? (
+        <Dashboard />
+      ) : (
+        <Login />
+      )}
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to Legatia</h1>
-      </header>
-    </div>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
