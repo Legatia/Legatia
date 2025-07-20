@@ -1,6 +1,19 @@
+type RelationshipType = variant {
+  Parent;
+  Child;
+  Spouse;
+  Sibling;
+  Other;
+};
+
+type Relationship = record {
+  from_principal: principal;
+  to_principal: principal;
+  relationship_type: RelationshipType;
+  custom_relationship: opt text;
+};
+
 service : {
-  "create_relationship": (text) -> (text);
-  "read_relationship": (text) -> (text);
-  "update_relationship": (text) -> (text);
-  "delete_relationship": (text) -> (text);
+  add_relationship: (principal, RelationshipType, opt text) -> (variant { Ok; Err: text });
+  get_relationships_for_user: (principal) -> (vec Relationship);
 }

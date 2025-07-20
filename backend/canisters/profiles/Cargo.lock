@@ -385,7 +385,10 @@ dependencies = [
 name = "profiles"
 version = "0.1.0"
 dependencies = [
+ "candid",
  "ic-cdk",
+ "serde",
+ "serde_derive",
 ]
 
 [[package]]

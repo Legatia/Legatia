@@ -1,6 +1,14 @@
+type Profile = record {
+  name: text;
+  sex: text;
+  birthday: text;
+  birthplace: text;
+  photo: vec nat8;
+};
+
 service : {
-  "create_profile": (text) -> (text);
-  "read_profile": (text) -> (text);
-  "update_profile": (text) -> (text);
-  "delete_profile": (text) -> (text);
+  create_profile: (Profile) -> (variant { Ok; Err: text });
+  read_profile: (principal) -> (variant { Ok: Profile; Err: text });
+  get_own_profile: () -> (variant { Ok: Profile; Err:text });
+  update_profile: (Profile) -> (variant { Ok; Err: text });
 }
