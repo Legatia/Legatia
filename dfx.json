@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "Legatia_new_backend": {
+      "candid": "src/Legatia_new_backend/Legatia_new_backend.did",
+      "package": "Legatia_new_backend",
+      "type": "rust"
+    },
+    "Legatia_new_frontend": {
+      "dependencies": [
+        "Legatia_new_backend"
+      ],
+      "source": [
+        "src/Legatia_new_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "Legatia_new_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
