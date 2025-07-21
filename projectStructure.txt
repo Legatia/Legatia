@@ -10,18 +10,30 @@ legatia/
 │   │   │   ├── profile/             # Profile creation & editing
 │   │   │   ├── family/              # Family tree views, admin functions
 │   │   │   ├── relationships/       # Relationship linking + invite logic
-│   │   │   ├── invites/             # One-time invitation code system
+│   │   │   ├── invites/             # One-time invitation code generation & claim flow (Rust)
 │   │   ├── services/                # Canister API integration (Candid interfaces)
+│   │   │   └── profiles.test.ts     # Frontend tests for profiles service
 │   │   ├── types/                   # Global TypeScript types (Profile, Family, etc.)
 │   │   ├── utils/                   # Formatters, validators, etc.
-│   │   └── App.tsx
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── index.css
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── vite.config.js
+│   ├── jest.config.js
+│   ├── babel.config.js
+│   ├── setupTests.js
+│   ├── index.html
 │   └── package.json
 │
 ├── backend/
-│   ├── canisters/
+│   ├── src/
 │   │   ├── profiles/
 │   │   │   ├── src/
 │   │   │   │   └── lib.rs          # CRUD logic for user profiles (Rust)
+│   │   │   ├── tests/
+│   │   │   │   └── profiles_test.rs # Backend tests for profiles canister
 │   │   │   └── Cargo.toml
 │   │   ├── families/
 │   │   │   ├── src/
@@ -35,16 +47,13 @@ legatia/
 │   │   │   ├── src/
 │   │   │   │   └── lib.rs          # One-time invite code generation & claim flow (Rust)
 │   │   │   └── Cargo.toml
-│   ├── candid/
-│   │   ├── profiles.did
-│   │   ├── families.did
-│   │   ├── relationships.did
-│   │   └── invites.did
+│   ├── Cargo.toml                   # Workspace root Cargo.toml
 │
 ├── docs/
 │   ├── architecture.md              # High-level structure
 │   ├── data-model.md                # Profiles, families, relationships schema
-│   └── roadmap.md                   # Milestones and deliverables
+│   ├── roadmap.md                   # Milestones and deliverables
+│   └── IMPLEMENTATION_SUMMARY.md    # Summary of implementation steps
 │
 ├── tests/
 │   ├── frontend/                    # Cypress / React Testing Library
@@ -52,4 +61,6 @@ legatia/
 │
 ├── dfx.json                         # ICP project config
 ├── README.md
-└── LICENSE
+├── LICENSE
+├── .gitignore
+└── projectStructure.txt
