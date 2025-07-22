@@ -15,11 +15,25 @@
 
 # rust
 target/
+Cargo.lock
+
+# canister ids
+.ic-assets.json5
+canister_ids.json
 
 # frontend code
 node_modules/
 dist/
 .svelte-kit/
+package-lock.json
 
 # environment variables
 .env
+
+# logs
+*.log
+dfx.log
+
+# temporary files
+*.tmp
+*.temp
