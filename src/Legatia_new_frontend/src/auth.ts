@@ -227,3 +227,12 @@ class AuthService {
 }
 
 export const authService = new AuthService();
+
+// Convenience function for components
+export const getBackendActor = async (): Promise<BackendActor> => {
+  const actor = authService.getActor();
+  if (!actor) {
+    throw new Error('Backend actor not available. Please authenticate first.');
+  }
+  return actor;
+};

@@ -1,22 +1,26 @@
 import { html, TemplateResult } from 'lit-html';
-import { Family, FamilyMember, FamilyEvent } from '../types';
+import { Family, FamilyMember, FamilyEvent, BackendActor } from '../types';
+import { getBackendActor } from '../auth';
 
 export class FamilyDetail {
   private family: Family;
   private onBack: () => void;
   private onAddMember: (familyId: string) => void;
   private onAddEvent: (familyId: string, memberId: string) => void;
+  private onFamilyUpdate: (family: Family) => void;
 
   constructor(
     family: Family,
     onBack: () => void,
     onAddMember: (familyId: string) => void,
-    onAddEvent: (familyId: string, memberId: string) => void
+    onAddEvent: (familyId: string, memberId: string) => void,
+    onFamilyUpdate: (family: Family) => void
   ) {
     this.family = family;
     this.onBack = onBack;
     this.onAddMember = onAddMember;
     this.onAddEvent = onAddEvent;
+    this.onFamilyUpdate = onFamilyUpdate;
   }
 
   private formatTimestamp(timestamp: bigint): string {
@@ -28,6 +32,29 @@ export class FamilyDetail {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  }
+
+  private async toggleVisibility(): Promise<void> {
+    try {
+      const actor = await getBackendActor();
+      const result = await actor.toggle_family_visibility(this.family.id, !this.family.is_visible);
+      
+      if ('Ok' in result) {
+        // Update the family object with new visibility status
+        const updatedFamily = { ...this.family, is_visible: !this.family.is_visible };
+        this.family = updatedFamily;
+        this.onFamilyUpdate(updatedFamily);
+        
+        // Show success message (could be handled by parent component)
+        console.log(result.Ok);
+      } else {
+        console.error('Failed to toggle visibility:', result.Err);
+        alert('Failed to toggle visibility: ' + result.Err);
+      }
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+      alert('Error toggling visibility: ' + error);
+    }
   }
 
   private renderMemberEvents(member: FamilyMember): TemplateResult {
@@ -126,6 +153,29 @@ export class FamilyDetail {
               ''
             }
             <span>${family.members.length} members</span>
+          </div>
+          
+          <div class="family-visibility">
+            <div class="visibility-status">
+              <span class="visibility-label">
+                Ghost Profile Discovery: 
+                <strong class="${family.is_visible ? 'visible' : 'hidden'}">
+                  ${family.is_visible ? '👁️ Visible' : '🔒 Hidden'}
+                </strong>
+              </span>
+              <button 
+                class="visibility-toggle ${family.is_visible ? 'hide-btn' : 'show-btn'}"
+                @click=${() => this.toggleVisibility()}
+                title="${family.is_visible ? 'Hide from ghost profile matching' : 'Allow ghost profile matching'}"
+              >
+                ${family.is_visible ? '🔒 Hide Family' : '👁️ Show Family'}
+              </button>
+            </div>
+            <small class="visibility-help">
+              ${family.is_visible 
+                ? 'Other users can discover and request to claim ghost profiles in this family.'
+                : 'This family is hidden from ghost profile matching to prevent unwanted claim requests.'}
+            </small>
           </div>
         </div>
 
