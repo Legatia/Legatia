@@ -9,6 +9,9 @@ use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
 use ic_stable_structures::storable::{Bound, Storable};
 use std::borrow::Cow;
 
+// Development mode - allows anonymous access for testing
+const DEV_MODE: bool = true;
+
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct UserProfile {
     pub full_name: String,
@@ -76,7 +79,7 @@ fn init() {
 fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, String> {
     let caller = api::caller();
     
-    if caller == Principal::anonymous() {
+    if !DEV_MODE && caller == Principal::anonymous() {
         return Err("Authentication required".to_string());
     }
 
@@ -107,7 +110,7 @@ fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, String> 
 fn update_profile(request: UpdateProfileRequest) -> Result<UserProfile, String> {
     let caller = api::caller();
     
-    if caller == Principal::anonymous() {
+    if !DEV_MODE && caller == Principal::anonymous() {
         return Err("Authentication required".to_string());
     }
 
@@ -148,7 +151,7 @@ fn update_profile(request: UpdateProfileRequest) -> Result<UserProfile, String> 
 fn get_profile() -> Result<UserProfile, String> {
     let caller = api::caller();
     
-    if caller == Principal::anonymous() {
+    if !DEV_MODE && caller == Principal::anonymous() {
         return Err("Authentication required".to_string());
     }
 
