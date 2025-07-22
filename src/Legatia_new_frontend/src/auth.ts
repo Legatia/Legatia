@@ -115,7 +115,7 @@ class AuthService {
     
     this.actor = createActor(process.env.CANISTER_ID_LEGATIA_NEW_BACKEND!, {
       agent,
-    }) as BackendActor;
+    }) as unknown as BackendActor;
   }
 
   private async setupDevActor(): Promise<void> {
@@ -152,7 +152,7 @@ class AuthService {
     
     this.actor = createActor(process.env.CANISTER_ID_LEGATIA_NEW_BACKEND!, {
       agent,
-    }) as BackendActor;
+    }) as unknown as BackendActor;
     
     console.log('Dev actor created successfully');
   }
@@ -215,7 +215,7 @@ class AuthService {
     
     this.actor = createActor(process.env.CANISTER_ID_LEGATIA_NEW_BACKEND!, {
       agent,
-    }) as BackendActor;
+    }) as unknown as BackendActor;
     
     console.log('Mock actor created successfully');
   }

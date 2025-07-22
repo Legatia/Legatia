@@ -291,3 +291,23 @@ pub fn toggle_family_visibility(family_id: String, is_visible: bool) -> Result<S
         }
     })
 }
+
+// Internal helper functions for other modules
+pub fn get_family_internal(family_id: &str) -> Result<Family, String> {
+    FAMILIES.with(|families| {
+        families.borrow()
+            .get(&family_id.to_string())
+            .ok_or("Family not found".to_string())
+    })
+}
+
+pub fn update_family_internal(family: Family) -> Result<(), String> {
+    FAMILIES.with(|families| {
+        families.borrow_mut().insert(family.id.clone(), family);
+        Ok(())
+    })
+}
+
+pub fn generate_member_id() -> String {
+    format!("member_{}", api::time())
+}

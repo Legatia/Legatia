@@ -164,6 +164,77 @@ export interface BackendActor {
   get_pending_claims_for_admin: () => Promise<ClaimRequestsResult>;
   process_ghost_profile_claim: (request: ProcessClaimRequest) => Promise<StringResult>;
   get_my_claim_requests: () => Promise<ClaimRequestsResult>;
+  
+  // User search and invitation functions
+  search_users: (query: string) => Promise<UserSearchResult>;
+  send_family_invitation: (request: SendInvitationRequest) => Promise<StringResult>;
+  process_family_invitation: (request: ProcessInvitationRequest) => Promise<StringResult>;
+  get_my_invitations: () => Promise<FamilyInvitationsResult>;
+  get_sent_invitations: () => Promise<FamilyInvitationsResult>;
+  
+  // Notification functions
+  get_my_notifications: () => Promise<NotificationsResult>;
+  get_unread_notification_count: () => Promise<{ Ok: bigint } | { Err: string }>;
+  mark_notification_read: (notification_id: string) => Promise<StringResult>;
+  mark_all_notifications_read: () => Promise<StringResult>;
 }
 
-export type ViewType = 'loading' | 'login' | 'create-profile' | 'profile' | 'edit-profile' | 'families' | 'family-detail' | 'create-family' | 'add-member' | 'add-event' | 'ghost-matches' | 'claim-requests' | 'admin-claims' | 'error';
+// User Search Types
+export interface UserSearchMatch {
+  id: string;
+  full_name: string;
+  surname_at_birth: string;
+  principal: Principal;
+}
+
+export type UserSearchResult = { Ok: UserSearchMatch[] } | { Err: string };
+
+// Family Invitation Types
+export interface FamilyInvitation {
+  id: string;
+  family_id: string;
+  family_name: string;
+  inviter: Principal;
+  inviter_name: string;
+  invitee: Principal;
+  invitee_id: string;
+  message?: [string] | [];
+  created_at: bigint;
+  status: InvitationStatus;
+  relationship_to_admin: string;
+}
+
+export type InvitationStatus = { Pending: null } | { Accepted: null } | { Declined: null } | { Expired: null };
+
+export interface SendInvitationRequest {
+  user_id: string;
+  family_id: string;
+  message?: [string] | [];
+  relationship_to_admin: string;
+}
+
+export interface ProcessInvitationRequest {
+  invitation_id: string;
+  accept: boolean;
+}
+
+export type FamilyInvitationsResult = { Ok: FamilyInvitation[] } | { Err: string };
+
+// Notification Types
+export interface Notification {
+  id: string;
+  recipient: Principal;
+  title: string;
+  message: string;
+  notification_type: NotificationType;
+  created_at: bigint;
+  read: boolean;
+  action_url?: [string] | [];
+  metadata?: [string] | [];
+}
+
+export type NotificationType = { FamilyInvitation: null } | { GhostProfileClaim: null } | { FamilyUpdate: null } | { SystemAlert: null };
+
+export type NotificationsResult = { Ok: Notification[] } | { Err: string };
+
+export type ViewType = 'loading' | 'login' | 'create-profile' | 'profile' | 'edit-profile' | 'families' | 'family-detail' | 'create-family' | 'add-member' | 'add-event' | 'ghost-matches' | 'claim-requests' | 'admin-claims' | 'user-search' | 'send-invitation' | 'my-invitations' | 'notifications' | 'error';

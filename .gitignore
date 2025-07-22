@@ -124,3 +124,16 @@ bower_components/
 .vscode-test/
 .storybook-out/
 .vuepress/dist/
+
+# Development and Testing
+test-results/
+playwright-report/
+coverage-report/
+benchmark-results/
+profiling-data/
+
+# Project specific
+*.did.js
+*.did.d.ts.bak
+.wasm_cache/
+.ic_commit_hash

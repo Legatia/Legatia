@@ -9,6 +9,7 @@ pub const DEV_MODE: bool = true;
 // Profile Types
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct UserProfile {
+    pub id: String, // Unique user ID (e.g., "user_001", "john_doe_1990")
     pub full_name: String,
     pub surname_at_birth: String,
     pub sex: String,
@@ -152,6 +153,75 @@ pub struct ProcessClaimRequest {
     pub admin_message: Option<String>,
 }
 
+// Family Invitation Types
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct FamilyInvitation {
+    pub id: String,
+    pub family_id: String,
+    pub family_name: String,
+    pub inviter: Principal, // Family admin who sent the invitation
+    pub inviter_name: String,
+    pub invitee: Principal, // User being invited
+    pub invitee_id: String, // User ID for reference
+    pub message: Option<String>,
+    pub created_at: u64,
+    pub status: InvitationStatus,
+    pub relationship_to_admin: String, // How they relate to the family admin
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum InvitationStatus {
+    Pending,
+    Accepted,
+    Declined,
+    Expired,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct SendInvitationRequest {
+    pub user_id: String, // Target user's unique ID
+    pub family_id: String,
+    pub message: Option<String>,
+    pub relationship_to_admin: String,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct ProcessInvitationRequest {
+    pub invitation_id: String,
+    pub accept: bool,
+}
+
+// User Search Types
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct UserSearchResult {
+    pub id: String,
+    pub full_name: String,
+    pub surname_at_birth: String,
+    pub principal: Principal,
+}
+
+// Unified Notification Types
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct Notification {
+    pub id: String,
+    pub recipient: Principal,
+    pub title: String,
+    pub message: String,
+    pub notification_type: NotificationType,
+    pub created_at: u64,
+    pub read: bool,
+    pub action_url: Option<String>, // URL for frontend navigation
+    pub metadata: Option<String>, // JSON metadata for specific actions
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum NotificationType {
+    FamilyInvitation,
+    GhostProfileClaim,
+    FamilyUpdate,
+    SystemAlert,
+}
+
 // Storable implementations
 impl Storable for UserProfile {
     fn to_bytes(&self) -> Cow<[u8]> {
@@ -190,6 +260,54 @@ impl Storable for UserFamilyList {
 }
 
 impl Storable for ClaimRequest {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(candid::encode_one(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        candid::decode_one(&bytes).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for FamilyInvitation {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(candid::encode_one(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        candid::decode_one(&bytes).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for Notification {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(candid::encode_one(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        candid::decode_one(&bytes).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for UserSearchResult {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(candid::encode_one(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        candid::decode_one(&bytes).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for InvitationStatus {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(candid::encode_one(self).unwrap())
     }

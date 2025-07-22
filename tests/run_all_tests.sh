@@ -41,6 +41,26 @@ else
 fi
 
 echo ""
+echo "🔗 Running Family Invitation System Tests..."
+echo "==========================================="
+if ./test_invitation_system.sh; then
+    echo "✅ Family invitation system tests passed!"
+else
+    echo "❌ Family invitation system tests failed!"
+    exit 1
+fi
+
+echo ""
+echo "🌳 Running Complete System Test..."
+echo "================================="
+if ./test_complete_system.sh; then
+    echo "✅ Complete system test passed!"
+else
+    echo "❌ Complete system test failed!"
+    exit 1
+fi
+
+echo ""
 echo "🎉 All Tests Completed Successfully!"
 echo "==================================="
 echo ""

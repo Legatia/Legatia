@@ -1,6 +1,15 @@
 use candid::Principal;
 use ic_cdk::api;
 use ic_cdk_macros::*;
+use ic_stable_structures::memory_manager::MemoryId;
+
+// Memory IDs for stable storage
+pub const INVITATIONS_MEMORY_ID: MemoryId = MemoryId::new(4);
+pub const NOTIFICATIONS_MEMORY_ID: MemoryId = MemoryId::new(5);
+pub const USER_SEARCH_MEMORY_ID: MemoryId = MemoryId::new(6);
+
+// Re-export memory manager
+pub use storage::MEMORY_MANAGER;
 
 // Module declarations
 mod types;
@@ -8,6 +17,7 @@ mod storage;
 mod profile;
 mod family;
 mod ghost;
+mod invitations;
 
 // Re-export types for Candid interface
 pub use types::*;
@@ -22,6 +32,11 @@ pub use family::{
 pub use ghost::{
     find_matching_ghost_profiles, submit_ghost_profile_claim, get_pending_claims_for_admin,
     process_ghost_profile_claim, get_my_claim_requests
+};
+pub use invitations::{
+    search_users, send_family_invitation, process_family_invitation, 
+    get_my_invitations, get_sent_invitations, get_my_notifications,
+    get_unread_notification_count, mark_notification_read, mark_all_notifications_read
 };
 
 #[init]

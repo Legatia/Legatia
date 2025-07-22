@@ -9,6 +9,10 @@ import { AddFamilyMemberForm } from './components/AddFamilyMemberForm';
 import { AddEventForm } from './components/AddEventForm';
 import { GhostProfileMatches } from './components/GhostProfileMatches';
 import { ClaimRequestsManager } from './components/ClaimRequestsManager';
+import { UserSearch } from './components/UserSearch';
+import { SendInvitation } from './components/SendInvitation';
+import { MyInvitations } from './components/MyInvitations';
+import { NotificationCenter } from './components/NotificationCenter';
 import { 
   UserProfile, 
   CreateProfileRequest, 
@@ -24,7 +28,10 @@ import {
   FamilyMemberResult,
   FamilyEventResult,
   GhostProfileMatch,
-  ProfileWithGhostResult
+  ProfileWithGhostResult,
+  UserSearchMatch,
+  FamilyInvitation,
+  Notification
 } from './types';
 import legatiaLogo from '../assets/legatia_logo_with_title.png';
 
@@ -39,6 +46,10 @@ class App {
   private currentMemberId: string = '';
   private currentMemberName: string = '';
   private ghostMatches: GhostProfileMatch[] = [];
+  private targetUser: UserSearchMatch | null = null;
+  private currentFamilyId: string = '';
+  private currentFamilyName: string = '';
+  private unreadNotificationCount: number = 0;
   
   constructor() {
     this.init();
@@ -430,6 +441,62 @@ class App {
     this.render();
   };
 
+  private handleViewMyInvitations = (): void => {
+    this.currentView = 'my-invitations';
+    this.render();
+  };
+
+  private handleViewNotifications = (): void => {
+    this.currentView = 'notifications';
+    this.render();
+  };
+
+  private handleSearchUsers = (familyId: string, familyName: string): void => {
+    this.currentFamilyId = familyId;
+    this.currentFamilyName = familyName;
+    this.currentView = 'user-search';
+    this.render();
+  };
+
+  private handleViewChange = (view: ViewType, data?: any): void => {
+    this.currentView = view;
+    
+    // Handle view-specific data
+    if (data) {
+      switch (view) {
+        case 'user-search':
+          this.currentFamilyId = data.familyId || '';
+          this.currentFamilyName = data.familyName || '';
+          break;
+        case 'send-invitation':
+          this.currentFamilyId = data.familyId || '';
+          this.currentFamilyName = data.familyName || '';
+          this.targetUser = data.targetUser || null;
+          break;
+        case 'family-detail':
+          if (data.familyId) {
+            this.handleViewFamily(data.familyId);
+            return; // handleViewFamily will call render
+          }
+          break;
+        case 'add-member':
+          if (data.familyId) {
+            this.handleAddMember(data.familyId);
+            return; // handleAddMember will call render
+          }
+          break;
+        case 'add-event':
+          if (data.familyId && data.memberId) {
+            this.handleAddEvent(data.familyId, data.memberId);
+            return; // handleAddEvent will call render
+          }
+          break;
+      }
+    }
+    
+    this.render();
+  };
+
   private renderLoginView(): TemplateResult {
     return html`
       <div class="login-view">
@@ -471,7 +538,9 @@ class App {
       this.handleEditProfile, 
       this.handleViewFamilies,
       this.handleViewClaimRequests,
-      this.handleViewAdminClaims
+      this.handleViewAdminClaims,
+      this.handleViewMyInvitations,
+      this.handleViewNotifications
     );
     return display.render();
   }
@@ -524,7 +593,8 @@ class App {
       this.handleBackToFamilies, 
       this.handleAddMember, 
       this.handleAddEvent,
-      this.handleFamilyUpdate
+      this.handleFamilyUpdate,
+      this.handleSearchUsers
     );
     return detail.render();
   }
@@ -583,6 +653,63 @@ class App {
     return claimManager.render();
   }
 
+  private renderUserSearchView(): TemplateResult {
+    const actor = authService.getActor();
+    if (!actor) {
+      return html`<div>Actor not available</div>`;
+    }
+    const userSearch = new UserSearch(
+      actor,
+      this.handleViewChange.bind(this),
+      () => this.handleViewChange('family-detail', { familyId: this.currentFamilyId }),
+      this.currentFamilyId,
+      this.currentFamilyName
+    );
+    return userSearch.render();
+  }
+
+  private renderSendInvitationView(): TemplateResult {
+    const actor = authService.getActor();
+    if (!actor || !this.targetUser) {
+      return html`<div>Actor or target user not available</div>`;
+    }
+    const sendInvitation = new SendInvitation(
+      actor,
+      this.handleViewChange.bind(this),
+      () => this.handleViewChange('user-search'),
+      this.currentFamilyId,
+      this.currentFamilyName,
+      this.targetUser
+    );
+    return sendInvitation.render();
+  }
+
+  private renderMyInvitationsView(): TemplateResult {
+    const actor = authService.getActor();
+    if (!actor) {
+      return html`<div>Actor not available</div>`;
+    }
+    const myInvitations = new MyInvitations(
+      actor,
+      this.handleViewChange.bind(this),
+      () => this.handleViewChange('profile')
+    );
+    return myInvitations.render();
+  }
+
+  private renderNotificationsView(): TemplateResult {
+    const actor = authService.getActor();
+    if (!actor) {
+      return html`<div>Actor not available</div>`;
+    }
+    const notificationCenter = new NotificationCenter(
+      actor,
+      this.handleViewChange.bind(this),
+      () => this.handleViewChange('profile')
+    );
+    return notificationCenter.render();
+  }
+
   private render(): void {
     let content: TemplateResult;
     
@@ -625,6 +752,18 @@ class App {
         break;
       case 'admin-claims':
         content = this.renderAdminClaimsView();
+        break;
+      case 'user-search':
+        content = this.renderUserSearchView();
+        break;
+      case 'send-invitation':
+        content = this.renderSendInvitationView();
+        break;
+      case 'my-invitations':
+        content = this.renderMyInvitationsView();
+        break;
+      case 'notifications':
+        content = this.renderNotificationsView();
         break;
       case 'error':
         content = this.renderErrorView();
