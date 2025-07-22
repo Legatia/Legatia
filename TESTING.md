@@ -72,6 +72,18 @@ dfx canister call Legatia_new_backend create_profile '(record {
 })'
 ```
 
+### 1b. Create Profile with Ancient Date (BC)
+```bash
+dfx canister call Legatia_new_backend create_profile '(record { 
+  full_name = "Julius Caesar"; 
+  surname_at_birth = "Caesar"; 
+  sex = "Male"; 
+  birthday = "100 BC"; 
+  birth_city = "Rome"; 
+  birth_country = "Roman Republic"; 
+})'
+```
+
 ### 2. Create a Family
 ```bash
 dfx canister call Legatia_new_backend create_family '(record { 
@@ -106,6 +118,19 @@ dfx canister call Legatia_new_backend add_member_event '(record {
   description = "Born in Boston Hospital"; 
   event_date = "1985-03-20"; 
   event_type = "birth"; 
+})'
+```
+
+### 4b. Add Ancient Event (BC Date)
+```bash
+# Example with BC date for historical figures
+dfx canister call Legatia_new_backend add_member_event '(record { 
+  family_id = "FAMILY_ID"; 
+  member_id = "MEMBER_ID"; 
+  title = "Became Consul"; 
+  description = "First consulship of Rome"; 
+  event_date = "59 BC"; 
+  event_type = "achievement"; 
 })'
 ```
 

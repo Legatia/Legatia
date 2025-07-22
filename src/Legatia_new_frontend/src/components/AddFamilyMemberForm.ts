@@ -1,10 +1,13 @@
 import { html, TemplateResult } from 'lit-html';
 import { AddFamilyMemberRequest } from '../types';
+import { DateInput } from './DateInput';
 
 export class AddFamilyMemberForm {
   private familyId: string;
   private onSubmit: (data: AddFamilyMemberRequest) => Promise<void>;
   private onCancel: () => void;
+  private birthday: string = '';
+  private deathDate: string = '';
 
   constructor(
     familyId: string,
@@ -16,6 +19,14 @@ export class AddFamilyMemberForm {
     this.onCancel = onCancel;
   }
 
+  private handleBirthdayChange = (value: string): void => {
+    this.birthday = value;
+  };
+
+  private handleDeathDateChange = (value: string): void => {
+    this.deathDate = value;
+  };
+
   private handleSubmit = async (e: Event): Promise<void> => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -26,10 +37,10 @@ export class AddFamilyMemberForm {
       full_name: formData.get('full_name') as string,
       surname_at_birth: formData.get('surname_at_birth') as string,
       sex: formData.get('sex') as string,
-      birthday: formData.get('birthday') ? [formData.get('birthday') as string] : [],
+      birthday: this.birthday ? [this.birthday] : [],
       birth_city: formData.get('birth_city') ? [formData.get('birth_city') as string] : [],
       birth_country: formData.get('birth_country') ? [formData.get('birth_country') as string] : [],
-      death_date: formData.get('death_date') ? [formData.get('death_date') as string] : [],
+      death_date: this.deathDate ? [this.deathDate] : [],
       relationship_to_admin: formData.get('relationship_to_admin') as string
     };
 
@@ -92,21 +103,11 @@ export class AddFamilyMemberForm {
 
           <div class="form-row">
             <div class="form-group">
-              <label for="birthday">Birthday (optional):</label>
-              <input 
-                type="date" 
-                id="birthday" 
-                name="birthday" 
-              />
+              ${new DateInput('birthday', 'Birthday (optional)', this.birthday, false, this.handleBirthdayChange).render()}
             </div>
 
             <div class="form-group">
-              <label for="death_date">Death Date (optional):</label>
-              <input 
-                type="date" 
-                id="death_date" 
-                name="death_date" 
-              />
+              ${new DateInput('death_date', 'Death Date (optional)', this.deathDate, false, this.handleDeathDateChange).render()}
             </div>
           </div>
 

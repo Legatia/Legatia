@@ -1,5 +1,6 @@
 import { html, TemplateResult } from 'lit-html';
 import { AddEventRequest } from '../types';
+import { DateInput } from './DateInput';
 
 export class AddEventForm {
   private familyId: string;
@@ -7,6 +8,7 @@ export class AddEventForm {
   private memberName: string;
   private onSubmit: (data: AddEventRequest) => Promise<void>;
   private onCancel: () => void;
+  private eventDate: string = '';
 
   constructor(
     familyId: string,
@@ -22,6 +24,10 @@ export class AddEventForm {
     this.onCancel = onCancel;
   }
 
+  private handleEventDateChange = (value: string): void => {
+    this.eventDate = value;
+  };
+
   private handleSubmit = async (e: Event): Promise<void> => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
@@ -32,7 +38,7 @@ export class AddEventForm {
       member_id: this.memberId,
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      event_date: formData.get('event_date') as string,
+      event_date: this.eventDate,
       event_type: formData.get('event_type') as string
     };
 
@@ -71,13 +77,7 @@ export class AddEventForm {
           </div>
 
           <div class="form-group">
-            <label for="event_date">Event Date:</label>
-            <input 
-              type="date" 
-              id="event_date" 
-              name="event_date" 
-              required 
-            />
+            ${new DateInput('event_date', 'Event Date', this.eventDate, true, this.handleEventDateChange).render()}
           </div>
 
           <div class="form-group">

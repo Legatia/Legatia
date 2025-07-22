@@ -1,11 +1,13 @@
 import { html, TemplateResult } from 'lit-html';
 import { UserProfile, CreateProfileRequest, UpdateProfileRequest } from '../types';
+import { DateInput } from './DateInput';
 
 export class ProfileForm {
   private onSubmitCreate: ((data: CreateProfileRequest) => Promise<void>) | null = null;
   private onSubmitUpdate: ((data: UpdateProfileRequest) => Promise<void>) | null = null;
   private initialData: UserProfile | null;
   private isEdit: boolean;
+  private birthday: string = '';
 
   constructor(
     onSubmit: (data: CreateProfileRequest) => Promise<void>,
@@ -21,6 +23,7 @@ export class ProfileForm {
   ) {
     this.initialData = initialData;
     this.isEdit = !!initialData;
+    this.birthday = initialData?.birthday || '';
     
     if (this.isEdit) {
       this.onSubmitUpdate = onSubmit as (data: UpdateProfileRequest) => Promise<void>;
@@ -28,6 +31,10 @@ export class ProfileForm {
       this.onSubmitCreate = onSubmit as (data: CreateProfileRequest) => Promise<void>;
     }
   }
+
+  private handleBirthdayChange = (value: string): void => {
+    this.birthday = value;
+  };
 
   private handleSubmit = async (e: Event): Promise<void> => {
     e.preventDefault();
@@ -38,7 +45,7 @@ export class ProfileForm {
       full_name: formData.get('full_name') as string,
       surname_at_birth: formData.get('surname_at_birth') as string,
       sex: formData.get('sex') as string,
-      birthday: formData.get('birthday') as string,
+      birthday: this.birthday,
       birth_city: formData.get('birth_city') as string,
       birth_country: formData.get('birth_country') as string
     };
@@ -101,14 +108,7 @@ export class ProfileForm {
           </div>
 
           <div class="form-group">
-            <label for="birthday">Birthday:</label>
-            <input 
-              type="date" 
-              id="birthday" 
-              name="birthday" 
-              value="${data.birthday || ''}" 
-              required 
-            />
+            ${new DateInput('birthday', 'Birthday', this.birthday, true, this.handleBirthdayChange).render()}
           </div>
 
           <div class="form-group">
