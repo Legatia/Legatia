@@ -23,7 +23,7 @@ fi
 echo ""
 echo "📋 Running Basic Backend Tests..."
 echo "================================"
-if ./tests/test_backend.sh; then
+if ./test_backend.sh; then
     echo "✅ Basic backend tests passed!"
 else
     echo "❌ Basic backend tests failed!"
@@ -33,7 +33,7 @@ fi
 echo ""
 echo "👻 Running Ghost Profile Workflow Tests..."
 echo "=========================================="
-if ./tests/test_ghost_profile_workflow.sh; then
+if ./test_ghost_profile_workflow.sh; then
     echo "✅ Ghost profile workflow tests passed!"
 else
     echo "❌ Ghost profile workflow tests failed!"

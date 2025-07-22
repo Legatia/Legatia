@@ -61,7 +61,7 @@ echo "----------------------------"
 # Test 2: Profile creation
 run_test "Create Test Profile" \
     "dfx canister call $CANISTER create_profile '(record { 
-        full_name = \"Test User $(date +%s)\"; 
+        full_name = \"Test User\"; 
         surname_at_birth = \"TestSurname\"; 
         sex = \"M\"; 
         birthday = \"1990-01-01\"; 
@@ -94,7 +94,7 @@ echo "-------------------------------"
 FAMILY_ID="test_family_$(date +%s)"
 run_test "Create Family" \
     "dfx canister call $CANISTER create_family '(record { 
-        name = \"Test Family $(date +%s)\"; 
+        name = \"Test Family\"; 
         description = \"A test family for automation\"; 
         is_visible = opt true 
     })'" \
