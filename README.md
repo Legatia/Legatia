@@ -24,7 +24,7 @@ A decentralized family tree and digital legacy platform built on the Internet Co
 **Prerequisites:** [DFX SDK](https://internetcomputer.org/docs/current/developer-docs/setup/sdk/), [Rust](https://rustup.rs/), Node.js
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Legatia/Legatia.git
 cd Legatia_new
 dfx start --background
 dfx deploy
