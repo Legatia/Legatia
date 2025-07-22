@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
 
-use crate::types::{UserProfile, Family, UserFamilyList};
+use crate::types::{UserProfile, Family, UserFamilyList, ClaimRequest};
 
 pub type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -27,6 +27,12 @@ thread_local! {
     pub static USER_FAMILIES: RefCell<StableBTreeMap<Principal, UserFamilyList, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(2)))
+        )
+    );
+
+    pub static CLAIM_REQUESTS: RefCell<StableBTreeMap<String, ClaimRequest, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3)))
         )
     );
 }

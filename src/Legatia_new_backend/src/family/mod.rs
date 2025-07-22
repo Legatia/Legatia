@@ -34,6 +34,7 @@ pub fn create_family(request: CreateFamilyRequest) -> Result<Family, String> {
         description: request.description,
         admin: caller,
         members: Vec::new(),
+        is_visible: request.is_visible.unwrap_or(true), // Default to visible if not specified
         created_at: current_time,
         updated_at: current_time,
     };
@@ -256,6 +257,35 @@ pub fn get_member_events_chronological(family_id: String, member_id: String) -> 
                 } else {
                     Err("Member not found in family".to_string())
                 }
+            }
+            None => Err("Family not found".to_string()),
+        }
+    })
+}
+
+#[update]
+pub fn toggle_family_visibility(family_id: String, is_visible: bool) -> Result<String, String> {
+    let caller = api::caller();
+    
+    if !DEV_MODE && caller == Principal::anonymous() {
+        return Err("Authentication required".to_string());
+    }
+
+    FAMILIES.with(|families| {
+        let mut families = families.borrow_mut();
+        match families.get(&family_id) {
+            Some(mut family) => {
+                // Check if caller is admin
+                if family.admin != caller {
+                    return Err("Only family admin can change visibility settings".to_string());
+                }
+                
+                family.is_visible = is_visible;
+                family.updated_at = api::time();
+                families.insert(family_id, family);
+                
+                let status = if is_visible { "visible" } else { "hidden" };
+                Ok(format!("Family visibility updated to {}", status))
             }
             None => Err("Family not found".to_string()),
         }

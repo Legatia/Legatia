@@ -33,6 +33,7 @@ export class ProfileForm {
   }
 
   private handleBirthdayChange = (value: string): void => {
+    console.log('Birthday changed to:', value); // Debug log
     this.birthday = value;
   };
 
@@ -49,6 +50,8 @@ export class ProfileForm {
       birth_city: formData.get('birth_city') as string,
       birth_country: formData.get('birth_country') as string
     };
+    
+    console.log('Submitting profile with birthday:', this.birthday); // Debug log
 
     if (this.isEdit && this.initialData && this.onSubmitUpdate) {
       // For updates, include all fields - changed fields as [value], unchanged as []

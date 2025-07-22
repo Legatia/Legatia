@@ -76,6 +76,7 @@ pub struct Family {
     pub description: String,
     pub admin: Principal,
     pub members: Vec<FamilyMember>,
+    pub is_visible: bool, // Controls if family is visible for ghost profile matching
     pub created_at: u64,
     pub updated_at: u64,
 }
@@ -84,6 +85,7 @@ pub struct Family {
 pub struct CreateFamilyRequest {
     pub name: String,
     pub description: String,
+    pub is_visible: Option<bool>, // Optional visibility setting, defaults to true
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -113,6 +115,43 @@ pub struct AddEventRequest {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct UserFamilyList(pub Vec<String>);
 
+// Ghost Profile Claiming System
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct GhostProfileMatch {
+    pub family_id: String,
+    pub member_id: String,
+    pub family_name: String,
+    pub ghost_profile_name: String,
+    pub similarity_score: u8, // 0-100, how closely the profiles match
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct ClaimRequest {
+    pub id: String,
+    pub requester: Principal,
+    pub family_id: String,
+    pub member_id: String,
+    pub requester_profile: UserProfile,
+    pub ghost_member: FamilyMember,
+    pub created_at: u64,
+    pub status: ClaimStatus,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub enum ClaimStatus {
+    Pending,
+    Approved,
+    Rejected,
+    Expired,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct ProcessClaimRequest {
+    pub claim_id: String,
+    pub approve: bool,
+    pub admin_message: Option<String>,
+}
+
 // Storable implementations
 impl Storable for UserProfile {
     fn to_bytes(&self) -> Cow<[u8]> {
@@ -139,6 +178,18 @@ impl Storable for Family {
 }
 
 impl Storable for UserFamilyList {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(candid::encode_one(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        candid::decode_one(&bytes).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for ClaimRequest {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(candid::encode_one(self).unwrap())
     }

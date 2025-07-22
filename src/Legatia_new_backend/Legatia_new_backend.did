@@ -60,6 +60,7 @@ type Family = record {
   description : text;
   admin : principal;
   members : vec FamilyMember;
+  is_visible : bool;
   created_at : nat64;
   updated_at : nat64;
 };
@@ -67,6 +68,7 @@ type Family = record {
 type CreateFamilyRequest = record {
   name : text;
   description : text;
+  is_visible : opt bool;
 };
 
 type AddFamilyMemberRequest = record {
@@ -98,10 +100,49 @@ type FamilyEventResult = variant { Ok : FamilyEvent; Err : text };
 type FamilyEventsResult = variant { Ok : vec FamilyEvent; Err : text };
 type StringResult = variant { Ok : text; Err : text };
 
+type GhostProfileMatch = record {
+  family_id : text;
+  member_id : text;
+  family_name : text;
+  ghost_profile_name : text;
+  similarity_score : nat8;
+};
+
+type ClaimStatus = variant {
+  Pending;
+  Approved;
+  Rejected;
+  Expired;
+};
+
+type ClaimRequest = record {
+  id : text;
+  requester : principal;
+  family_id : text;
+  member_id : text;
+  requester_profile : UserProfile;
+  ghost_member : FamilyMember;
+  created_at : nat64;
+  status : ClaimStatus;
+};
+
+type ProcessClaimRequest = record {
+  claim_id : text;
+  approve : bool;
+  admin_message : opt text;
+};
+
+type GhostProfileMatchResult = variant { Ok : vec GhostProfileMatch; Err : text };
+type ClaimRequestResult = variant { Ok : ClaimRequest; Err : text };
+type ClaimRequestsResult = variant { Ok : vec ClaimRequest; Err : text };
+type ProfileWithGhostResult = variant { Ok : record { UserProfile; vec GhostProfileMatch }; Err : text };
+
 service : {
   create_profile : (CreateProfileRequest) -> (ProfileResult);
   update_profile : (UpdateProfileRequest) -> (ProfileResult);
   get_profile : () -> (ProfileResult) query;
+  create_profile_with_ghost_check : (CreateProfileRequest) -> (ProfileWithGhostResult);
+  update_profile_with_ghost_check : (UpdateProfileRequest) -> (ProfileWithGhostResult);
   whoami : () -> (principal) query;
   
   create_family : (CreateFamilyRequest) -> (FamilyResult);
@@ -113,4 +154,12 @@ service : {
   
   add_member_event : (AddEventRequest) -> (FamilyEventResult);
   get_member_events_chronological : (text, text) -> (FamilyEventsResult) query;
+  
+  find_matching_ghost_profiles : () -> (GhostProfileMatchResult) query;
+  submit_ghost_profile_claim : (text, text) -> (ClaimRequestResult);
+  get_pending_claims_for_admin : () -> (ClaimRequestsResult) query;
+  process_ghost_profile_claim : (ProcessClaimRequest) -> (StringResult);
+  get_my_claim_requests : () -> (ClaimRequestsResult) query;
+  
+  toggle_family_visibility : (text, bool) -> (StringResult);
 }

@@ -7,6 +7,8 @@ import { FamilyDetail } from './components/FamilyDetail';
 import { FamilyCreateForm } from './components/FamilyCreateForm';
 import { AddFamilyMemberForm } from './components/AddFamilyMemberForm';
 import { AddEventForm } from './components/AddEventForm';
+import { GhostProfileMatches } from './components/GhostProfileMatches';
+import { ClaimRequestsManager } from './components/ClaimRequestsManager';
 import { 
   UserProfile, 
   CreateProfileRequest, 
@@ -20,7 +22,9 @@ import {
   AddFamilyMemberRequest,
   AddEventRequest,
   FamilyMemberResult,
-  FamilyEventResult
+  FamilyEventResult,
+  GhostProfileMatch,
+  ProfileWithGhostResult
 } from './types';
 import legatiaLogo from '../assets/legatia_logo_with_title.png';
 
@@ -34,6 +38,7 @@ class App {
   private currentFamily: Family | null = null;
   private currentMemberId: string = '';
   private currentMemberName: string = '';
+  private ghostMatches: GhostProfileMatch[] = [];
   
   constructor() {
     this.init();
@@ -395,6 +400,36 @@ class App {
     this.render();
   };
 
+  private handleFamilyUpdate = (updatedFamily: Family): void => {
+    this.currentFamily = updatedFamily;
+    // Update in families list if it exists there
+    const index = this.families.findIndex(f => f.id === updatedFamily.id);
+    if (index !== -1) {
+      this.families[index] = updatedFamily;
+    }
+    this.render();
+  };
+
+  private handleBackFromGhostMatches = (): void => {
+    this.currentView = 'profile';
+    this.render();
+  };
+
+  private handleViewClaimRequests = (): void => {
+    this.currentView = 'claim-requests';
+    this.render();
+  };
+
+  private handleViewAdminClaims = (): void => {
+    this.currentView = 'admin-claims';
+    this.render();
+  };
+
+  private handleBackFromClaimRequests = (): void => {
+    this.currentView = 'profile';
+    this.render();
+  };
+
   private renderLoginView(): TemplateResult {
     return html`
       <div class="login-view">
@@ -431,7 +466,13 @@ class App {
     if (!this.profile) {
       return html`<div>No profile data available</div>`;
     }
-    const display = new ProfileDisplay(this.profile, this.handleEditProfile, this.handleViewFamilies);
+    const display = new ProfileDisplay(
+      this.profile, 
+      this.handleEditProfile, 
+      this.handleViewFamilies,
+      this.handleViewClaimRequests,
+      this.handleViewAdminClaims
+    );
     return display.render();
   }
 
@@ -482,7 +523,8 @@ class App {
       this.currentFamily, 
       this.handleBackToFamilies, 
       this.handleAddMember, 
-      this.handleAddEvent
+      this.handleAddEvent,
+      this.handleFamilyUpdate
     );
     return detail.render();
   }
@@ -526,6 +568,21 @@ class App {
     `;
   }
 
+  private renderGhostMatchesView(): TemplateResult {
+    const ghostMatches = new GhostProfileMatches(this.ghostMatches, this.handleBackFromGhostMatches);
+    return ghostMatches.render();
+  }
+
+  private renderClaimRequestsView(): TemplateResult {
+    const claimManager = new ClaimRequestsManager('user', this.handleBackFromClaimRequests);
+    return claimManager.render();
+  }
+
+  private renderAdminClaimsView(): TemplateResult {
+    const claimManager = new ClaimRequestsManager('admin', this.handleBackFromClaimRequests);
+    return claimManager.render();
+  }
+
   private render(): void {
     let content: TemplateResult;
     
@@ -559,6 +616,15 @@ class App {
         break;
       case 'add-event':
         content = this.renderAddEventView();
+        break;
+      case 'ghost-matches':
+        content = this.renderGhostMatchesView();
+        break;
+      case 'claim-requests':
+        content = this.renderClaimRequestsView();
+        break;
+      case 'admin-claims':
+        content = this.renderAdminClaimsView();
         break;
       case 'error':
         content = this.renderErrorView();
