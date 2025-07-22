@@ -44,17 +44,17 @@ export class ProfileForm {
     };
 
     if (this.isEdit && this.initialData && this.onSubmitUpdate) {
-      // For updates, only include changed fields
-      const updateData: UpdateProfileRequest = {};
-      Object.keys(profileData).forEach(key => {
-        const fieldKey = key as keyof CreateProfileRequest;
-        const currentValue = profileData[fieldKey];
-        const initialValue = this.initialData![fieldKey] || '';
-        
-        if (currentValue !== initialValue) {
-          (updateData as any)[fieldKey] = [currentValue]; // Wrap in array for Optional<String>
-        }
-      });
+      // For updates, include all fields - changed fields as [value], unchanged as []
+      const updateData: UpdateProfileRequest = {
+        full_name: profileData.full_name !== (this.initialData.full_name || '') ? [profileData.full_name] : [],
+        surname_at_birth: profileData.surname_at_birth !== (this.initialData.surname_at_birth || '') ? [profileData.surname_at_birth] : [],
+        sex: profileData.sex !== (this.initialData.sex || '') ? [profileData.sex] : [],
+        birthday: profileData.birthday !== (this.initialData.birthday || '') ? [profileData.birthday] : [],
+        birth_city: profileData.birth_city !== (this.initialData.birth_city || '') ? [profileData.birth_city] : [],
+        birth_country: profileData.birth_country !== (this.initialData.birth_country || '') ? [profileData.birth_country] : [],
+      };
+      
+      console.log('Update data:', updateData);
       await this.onSubmitUpdate(updateData);
     } else if (this.onSubmitCreate) {
       await this.onSubmitCreate(profileData as CreateProfileRequest);

@@ -21,12 +21,12 @@ export interface CreateProfileRequest {
 }
 
 export interface UpdateProfileRequest {
-  full_name?: [string];
-  surname_at_birth?: [string];
-  sex?: [string];
-  birthday?: [string];
-  birth_city?: [string];
-  birth_country?: [string];
+  full_name?: [string] | [];
+  surname_at_birth?: [string] | [];
+  sex?: [string] | [];
+  birthday?: [string] | [];
+  birth_city?: [string] | [];
+  birth_country?: [string] | [];
 }
 
 export type ProfileResult = { Ok: UserProfile } | { Err: string };
