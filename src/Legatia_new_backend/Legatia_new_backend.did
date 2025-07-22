@@ -27,11 +27,90 @@ type UpdateProfileRequest = record {
   birth_country : opt text;
 };
 
-type Result = variant { Ok : UserProfile; Err : text };
+type FamilyEvent = record {
+  id : text;
+  member_id : text;
+  title : text;
+  description : text;
+  event_date : text;
+  event_type : text;
+  created_at : nat64;
+  created_by : principal;
+};
+
+type FamilyMember = record {
+  id : text;
+  profile_principal : opt principal;
+  full_name : text;
+  surname_at_birth : text;
+  sex : text;
+  birthday : opt text;
+  birth_city : opt text;
+  birth_country : opt text;
+  death_date : opt text;
+  relationship_to_admin : text;
+  events : vec FamilyEvent;
+  created_at : nat64;
+  created_by : principal;
+};
+
+type Family = record {
+  id : text;
+  name : text;
+  description : text;
+  admin : principal;
+  members : vec FamilyMember;
+  created_at : nat64;
+  updated_at : nat64;
+};
+
+type CreateFamilyRequest = record {
+  name : text;
+  description : text;
+};
+
+type AddFamilyMemberRequest = record {
+  family_id : text;
+  full_name : text;
+  surname_at_birth : text;
+  sex : text;
+  birthday : opt text;
+  birth_city : opt text;
+  birth_country : opt text;
+  death_date : opt text;
+  relationship_to_admin : text;
+};
+
+type AddEventRequest = record {
+  family_id : text;
+  member_id : text;
+  title : text;
+  description : text;
+  event_date : text;
+  event_type : text;
+};
+
+type ProfileResult = variant { Ok : UserProfile; Err : text };
+type FamilyResult = variant { Ok : Family; Err : text };
+type FamilyListResult = variant { Ok : vec Family; Err : text };
+type FamilyMemberResult = variant { Ok : FamilyMember; Err : text };
+type FamilyEventResult = variant { Ok : FamilyEvent; Err : text };
+type FamilyEventsResult = variant { Ok : vec FamilyEvent; Err : text };
+type StringResult = variant { Ok : text; Err : text };
 
 service : {
-  create_profile : (CreateProfileRequest) -> (Result);
-  update_profile : (UpdateProfileRequest) -> (Result);
-  get_profile : () -> (Result) query;
+  create_profile : (CreateProfileRequest) -> (ProfileResult);
+  update_profile : (UpdateProfileRequest) -> (ProfileResult);
+  get_profile : () -> (ProfileResult) query;
   whoami : () -> (principal) query;
+  
+  create_family : (CreateFamilyRequest) -> (FamilyResult);
+  get_user_families : () -> (FamilyListResult) query;
+  get_family : (text) -> (FamilyResult) query;
+  
+  add_family_member : (AddFamilyMemberRequest) -> (FamilyMemberResult);
+  remove_family_member : (text, text) -> (StringResult);
+  
+  add_member_event : (AddEventRequest) -> (FamilyEventResult);
+  get_member_events_chronological : (text, text) -> (FamilyEventsResult) query;
 }

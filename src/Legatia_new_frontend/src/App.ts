@@ -2,7 +2,26 @@ import { html, render, TemplateResult } from 'lit-html';
 import { authService } from './auth';
 import { ProfileForm } from './components/ProfileForm';
 import { ProfileDisplay } from './components/ProfileDisplay';
-import { UserProfile, CreateProfileRequest, UpdateProfileRequest, ViewType, ProfileResult } from './types';
+import { FamilyList } from './components/FamilyList';
+import { FamilyDetail } from './components/FamilyDetail';
+import { FamilyCreateForm } from './components/FamilyCreateForm';
+import { AddFamilyMemberForm } from './components/AddFamilyMemberForm';
+import { AddEventForm } from './components/AddEventForm';
+import { 
+  UserProfile, 
+  CreateProfileRequest, 
+  UpdateProfileRequest, 
+  ViewType, 
+  ProfileResult,
+  Family,
+  FamilyResult,
+  FamilyListResult,
+  CreateFamilyRequest,
+  AddFamilyMemberRequest,
+  AddEventRequest,
+  FamilyMemberResult,
+  FamilyEventResult
+} from './types';
 import legatiaLogo from '../assets/legatia_logo_with_title.png';
 
 class App {
@@ -11,6 +30,10 @@ class App {
   private currentView: ViewType = 'loading';
   private error: string = '';
   private loading: boolean = false;
+  private families: Family[] = [];
+  private currentFamily: Family | null = null;
+  private currentMemberId: string = '';
+  private currentMemberName: string = '';
   
   constructor() {
     this.init();
@@ -188,6 +211,190 @@ class App {
     this.render();
   };
 
+  private handleViewFamilies = async (): Promise<void> => {
+    try {
+      this.loading = true;
+      this.render();
+      
+      const actor = authService.getActor();
+      if (!actor) {
+        throw new Error('Actor not available');
+      }
+
+      const result: FamilyListResult = await actor.get_user_families();
+      
+      if ('Ok' in result) {
+        this.families = result.Ok;
+        this.currentView = 'families';
+        this.error = '';
+      } else {
+        this.error = result.Err;
+      }
+    } catch (error) {
+      console.error('Failed to load families:', error);
+      this.error = 'Failed to load families';
+    } finally {
+      this.loading = false;
+      this.render();
+    }
+  };
+
+  private handleCreateFamily = (): void => {
+    this.currentView = 'create-family';
+    this.render();
+  };
+
+  private handleSubmitCreateFamily = async (familyData: CreateFamilyRequest): Promise<void> => {
+    try {
+      this.loading = true;
+      this.render();
+      
+      const actor = authService.getActor();
+      if (!actor) {
+        throw new Error('Actor not available');
+      }
+
+      const result: FamilyResult = await actor.create_family(familyData);
+      
+      if ('Ok' in result) {
+        this.families.push(result.Ok);
+        this.currentView = 'families';
+        this.error = '';
+      } else {
+        this.error = result.Err;
+      }
+    } catch (error) {
+      console.error('Failed to create family:', error);
+      this.error = 'Failed to create family';
+    } finally {
+      this.loading = false;
+      this.render();
+    }
+  };
+
+  private handleViewFamily = async (familyId: string): Promise<void> => {
+    try {
+      this.loading = true;
+      this.render();
+      
+      const actor = authService.getActor();
+      if (!actor) {
+        throw new Error('Actor not available');
+      }
+
+      const result: FamilyResult = await actor.get_family(familyId);
+      
+      if ('Ok' in result) {
+        this.currentFamily = result.Ok;
+        this.currentView = 'family-detail';
+        this.error = '';
+      } else {
+        this.error = result.Err;
+      }
+    } catch (error) {
+      console.error('Failed to load family:', error);
+      this.error = 'Failed to load family';
+    } finally {
+      this.loading = false;
+      this.render();
+    }
+  };
+
+  private handleAddMember = (familyId: string): void => {
+    this.currentView = 'add-member';
+    this.render();
+  };
+
+  private handleSubmitAddMember = async (memberData: AddFamilyMemberRequest): Promise<void> => {
+    try {
+      this.loading = true;
+      this.render();
+      
+      const actor = authService.getActor();
+      if (!actor) {
+        throw new Error('Actor not available');
+      }
+
+      const result: FamilyMemberResult = await actor.add_family_member(memberData);
+      
+      if ('Ok' in result) {
+        // Refresh family data
+        await this.handleViewFamily(memberData.family_id);
+        this.error = '';
+      } else {
+        this.error = result.Err;
+        this.loading = false;
+        this.render();
+      }
+    } catch (error) {
+      console.error('Failed to add member:', error);
+      this.error = 'Failed to add member';
+      this.loading = false;
+      this.render();
+    }
+  };
+
+  private handleAddEvent = (familyId: string, memberId: string): void => {
+    // Find member name for display
+    if (this.currentFamily) {
+      const member = this.currentFamily.members.find(m => m.id === memberId);
+      this.currentMemberName = member?.full_name || 'Unknown';
+    }
+    this.currentMemberId = memberId;
+    this.currentView = 'add-event';
+    this.render();
+  };
+
+  private handleSubmitAddEvent = async (eventData: AddEventRequest): Promise<void> => {
+    try {
+      this.loading = true;
+      this.render();
+      
+      const actor = authService.getActor();
+      if (!actor) {
+        throw new Error('Actor not available');
+      }
+
+      const result: FamilyEventResult = await actor.add_member_event(eventData);
+      
+      if ('Ok' in result) {
+        // Refresh family data
+        await this.handleViewFamily(eventData.family_id);
+        this.error = '';
+      } else {
+        this.error = result.Err;
+        this.loading = false;
+        this.render();
+      }
+    } catch (error) {
+      console.error('Failed to add event:', error);
+      this.error = 'Failed to add event';
+      this.loading = false;
+      this.render();
+    }
+  };
+
+  private handleBackToFamilies = (): void => {
+    this.currentView = 'families';
+    this.currentFamily = null;
+    this.render();
+  };
+
+  private handleBackToProfile = (): void => {
+    this.currentView = 'profile';
+    this.render();
+  };
+
+  private handleCancel = (): void => {
+    if (this.currentFamily) {
+      this.currentView = 'family-detail';
+    } else {
+      this.currentView = 'families';
+    }
+    this.error = '';
+    this.render();
+  };
+
   private renderLoginView(): TemplateResult {
     return html`
       <div class="login-view">
@@ -224,7 +431,7 @@ class App {
     if (!this.profile) {
       return html`<div>No profile data available</div>`;
     }
-    const display = new ProfileDisplay(this.profile, this.handleEditProfile);
+    const display = new ProfileDisplay(this.profile, this.handleEditProfile, this.handleViewFamilies);
     return display.render();
   }
 
@@ -248,6 +455,62 @@ class App {
         <p>Loading your family legacy...</p>
       </div>
     `;
+  }
+
+  private renderFamiliesView(): TemplateResult {
+    const familyList = new FamilyList(this.families, this.handleCreateFamily, this.handleViewFamily);
+    return html`
+      <div class="families-view">
+        <div class="view-header">
+          <button @click=${this.handleBackToProfile} class="btn-back">← Back to Profile</button>
+        </div>
+        ${familyList.render()}
+      </div>
+    `;
+  }
+
+  private renderCreateFamilyView(): TemplateResult {
+    const form = new FamilyCreateForm(this.handleSubmitCreateFamily, this.handleBackToFamilies);
+    return form.render();
+  }
+
+  private renderFamilyDetailView(): TemplateResult {
+    if (!this.currentFamily) {
+      return html`<div>No family data available</div>`;
+    }
+    const detail = new FamilyDetail(
+      this.currentFamily, 
+      this.handleBackToFamilies, 
+      this.handleAddMember, 
+      this.handleAddEvent
+    );
+    return detail.render();
+  }
+
+  private renderAddMemberView(): TemplateResult {
+    if (!this.currentFamily) {
+      return html`<div>No family data available</div>`;
+    }
+    const form = new AddFamilyMemberForm(
+      this.currentFamily.id,
+      this.handleSubmitAddMember,
+      this.handleCancel
+    );
+    return form.render();
+  }
+
+  private renderAddEventView(): TemplateResult {
+    if (!this.currentFamily) {
+      return html`<div>No family data available</div>`;
+    }
+    const form = new AddEventForm(
+      this.currentFamily.id,
+      this.currentMemberId,
+      this.currentMemberName,
+      this.handleSubmitAddEvent,
+      this.handleCancel
+    );
+    return form.render();
   }
 
   private renderErrorView(): TemplateResult {
@@ -281,6 +544,21 @@ class App {
         break;
       case 'edit-profile':
         content = this.renderEditProfileView();
+        break;
+      case 'families':
+        content = this.renderFamiliesView();
+        break;
+      case 'create-family':
+        content = this.renderCreateFamilyView();
+        break;
+      case 'family-detail':
+        content = this.renderFamilyDetailView();
+        break;
+      case 'add-member':
+        content = this.renderAddMemberView();
+        break;
+      case 'add-event':
+        content = this.renderAddEventView();
         break;
       case 'error':
         content = this.renderErrorView();

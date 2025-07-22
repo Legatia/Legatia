@@ -4,10 +4,12 @@ import { UserProfile } from '../types';
 export class ProfileDisplay {
   private profile: UserProfile;
   private onEdit: () => void;
+  private onViewFamilies: () => void;
 
-  constructor(profile: UserProfile, onEdit: () => void) {
+  constructor(profile: UserProfile, onEdit: () => void, onViewFamilies: () => void) {
     this.profile = profile;
     this.onEdit = onEdit;
+    this.onViewFamilies = onViewFamilies;
   }
 
   private formatDate(dateString: string): string {
@@ -70,9 +72,14 @@ export class ProfileDisplay {
           </div>
         </div>
 
-        <button @click=${this.onEdit} class="btn-secondary">
-          Edit Profile
-        </button>
+        <div class="profile-actions">
+          <button @click=${this.onEdit} class="btn-secondary">
+            Edit Profile
+          </button>
+          <button @click=${this.onViewFamilies} class="btn-primary">
+            Manage Families
+          </button>
+        </div>
       </div>
     `;
   }

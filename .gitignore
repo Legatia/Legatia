@@ -20,10 +20,11 @@ canister_ids.json
 **/declarations/
 src/declarations/
 
-# rust
+# Rust
 target/
 Cargo.lock
 **/*.rs.bk
+**/Cargo.lock
 
 # frontend code
 node_modules/
@@ -93,3 +94,24 @@ jspm_packages/
 
 # Local development overrides
 .local
+
+# IDE specific files
+*.code-workspace
+.history/
+.metals/
+.bloop/
+
+# Security - never commit these
+*.pem
+*.key
+seed.txt
+.dfx/identity/
+identity.pem
+
+# ICP specific
+.vessel/
+.moc/
+
+# Backup files
+*.bak
+*.backup
