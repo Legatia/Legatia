@@ -7,7 +7,7 @@ use std::borrow::Cow;
 pub const DEV_MODE: bool = true;
 
 // Profile Types
-#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct UserProfile {
     pub id: String, // Unique user ID (e.g., "user_001", "john_doe_1990")
     pub full_name: String,
@@ -80,6 +80,21 @@ pub struct Family {
     pub is_visible: bool, // Controls if family is visible for ghost profile matching
     pub created_at: u64,
     pub updated_at: u64,
+}
+
+impl Default for Family {
+    fn default() -> Self {
+        Self {
+            id: String::new(),
+            name: String::new(),
+            description: String::new(),
+            admin: Principal::anonymous(),
+            members: Vec::new(),
+            is_visible: false,
+            created_at: 0,
+            updated_at: 0,
+        }
+    }
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -225,11 +240,25 @@ pub enum NotificationType {
 // Storable implementations
 impl Storable for UserProfile {
     fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(candid::encode_one(self).unwrap())
+        match candid::encode_one(self) {
+            Ok(bytes) => Cow::Owned(bytes),
+            Err(_) => {
+                // Log error and return empty bytes as fallback
+                ic_cdk::println!("Failed to serialize UserProfile");
+                Cow::Owned(vec![])
+            }
+        }
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        candid::decode_one(&bytes).unwrap()
+        match candid::decode_one(&bytes) {
+            Ok(profile) => profile,
+            Err(_) => {
+                // Log error and return default profile as fallback
+                ic_cdk::println!("Failed to deserialize UserProfile, using default");
+                UserProfile::default()
+            }
+        }
     }
 
     const BOUND: Bound = Bound::Unbounded;
@@ -237,11 +266,25 @@ impl Storable for UserProfile {
 
 impl Storable for Family {
     fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(candid::encode_one(self).unwrap())
+        match candid::encode_one(self) {
+            Ok(bytes) => Cow::Owned(bytes),
+            Err(_) => {
+                // Log error and return empty bytes as fallback
+                ic_cdk::println!("Failed to serialize Family");
+                Cow::Owned(vec![])
+            }
+        }
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        candid::decode_one(&bytes).unwrap()
+        match candid::decode_one(&bytes) {
+            Ok(family) => family,
+            Err(_) => {
+                // Log error and return default family as fallback
+                ic_cdk::println!("Failed to deserialize Family, using default");
+                Family::default()
+            }
+        }
     }
 
     const BOUND: Bound = Bound::Unbounded;

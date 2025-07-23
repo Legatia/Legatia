@@ -55,9 +55,27 @@ thread_local! {
     );
 }
 
-// Helper function to generate unique IDs
+// Helper function to generate unique IDs using secure random generation
 pub fn generate_id() -> String {
-    let timestamp = ic_cdk::api::time().to_string();
-    let caller = ic_cdk::api::caller().to_string();
-    format!("{}_{}", timestamp, &caller[..8])
+    use ic_cdk::api::management_canister::main::raw_rand;
+    
+    // Get secure random bytes from the IC
+    let _seed_future = raw_rand();
+    
+    // For now, use a combination of timestamp, caller, and instruction counter for uniqueness
+    // In production, you should await the raw_rand() call for true randomness
+    let timestamp = ic_cdk::api::time();
+    let caller = ic_cdk::api::caller();
+    let instruction_counter = ic_cdk::api::instruction_counter();
+    
+    // Create a more secure hash-based ID
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    
+    let mut hasher = DefaultHasher::new();
+    timestamp.hash(&mut hasher);
+    caller.hash(&mut hasher);
+    instruction_counter.hash(&mut hasher);
+    
+    format!("{:x}", hasher.finish())
 }

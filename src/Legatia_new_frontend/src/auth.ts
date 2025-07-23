@@ -129,7 +129,7 @@ class AuthService {
     this.principal = identity.getPrincipal();
     
     console.log('Setting up dev actor with canister ID:', process.env.CANISTER_ID_LEGATIA_NEW_BACKEND);
-    console.log('Using principal:', this.principal.toString());
+    console.log('Using authenticated principal for dev mode');
     
     // Use appropriate host to avoid CSP issues
     const currentHost = window.location.origin;
@@ -181,7 +181,7 @@ class AuthService {
     this.principal = mockIdentity.getPrincipal();
     this.isAuthenticated = true;
     
-    console.log('Mock login successful with principal:', this.principal.toString());
+    console.log('Mock login successful');
     
     await this.setupMockActor(mockIdentity);
     return true;

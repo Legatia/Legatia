@@ -9,6 +9,7 @@ export class FamilyDetail {
   private onAddEvent: (familyId: string, memberId: string) => void;
   private onFamilyUpdate: (family: Family) => void;
   private onSearchUsers: (familyId: string, familyName: string) => void;
+  private errorMessage: string = '';
 
   constructor(
     family: Family,
@@ -52,12 +53,20 @@ export class FamilyDetail {
         console.log(result.Ok);
       } else {
         console.error('Failed to toggle visibility:', result.Err);
-        alert('Failed to toggle visibility: ' + result.Err);
+        this.showErrorMessage('Failed to toggle visibility. Please try again.');
       }
     } catch (error) {
       console.error('Error toggling visibility:', error);
-      alert('Error toggling visibility: ' + error);
+      this.showErrorMessage('Error toggling visibility. Please try again.');
     }
+  }
+
+  private showErrorMessage(message: string) {
+    this.errorMessage = message;
+    // Clear error after 5 seconds
+    setTimeout(() => {
+      this.errorMessage = '';
+    }, 5000);
   }
 
   private renderMemberEvents(member: FamilyMember): TemplateResult {
@@ -139,6 +148,11 @@ export class FamilyDetail {
     
     return html`
       <div class="family-detail">
+        ${this.errorMessage ? html`
+          <div class="error-message" style="background: #fee; color: #c33; padding: 10px; margin: 10px 0; border-radius: 4px;">
+            ${this.errorMessage}
+          </div>
+        ` : ''}
         <div class="family-detail-header">
           <button @click=${this.onBack} class="btn-back">← Back to Families</button>
           <h2>${family.name}</h2>

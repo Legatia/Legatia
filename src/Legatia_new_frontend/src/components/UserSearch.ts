@@ -29,8 +29,23 @@ export class UserSearch {
 
 
   private async handleSearch() {
-    if (this.searchQuery.trim().length < 2) {
+    const sanitizedQuery = this.searchQuery.trim();
+    
+    // Enhanced input validation
+    if (sanitizedQuery.length < 2) {
       this.message = 'Please enter at least 2 characters to search';
+      return;
+    }
+    
+    if (sanitizedQuery.length > 50) {
+      this.message = 'Search query too long (max 50 characters)';
+      return;
+    }
+    
+    // Basic sanitization - remove potentially harmful characters
+    const validPattern = /^[a-zA-Z0-9\s\-_.@]+$/;
+    if (!validPattern.test(sanitizedQuery)) {
+      this.message = 'Search query contains invalid characters';
       return;
     }
 
@@ -39,7 +54,7 @@ export class UserSearch {
     this.searchResults = [];
 
     try {
-      const result = await this.actor.search_users(this.searchQuery.trim());
+      const result = await this.actor.search_users(sanitizedQuery);
       
       if ('Ok' in result) {
         this.searchResults = result.Ok;
