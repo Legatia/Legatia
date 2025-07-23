@@ -137,3 +137,106 @@ profiling-data/
 *.did.d.ts.bak
 .wasm_cache/
 .ic_commit_hash
+
+# Token project specific
+Legatia_token/target/
+Legatia_token/.dfx/
+Legatia_token/src/declarations/
+Legatia_token/canister_ids.json
+Legatia_token/.env
+Legatia_token/Cargo.lock
+Legatia_token/**/*.wasm
+Legatia_token/**/*.wasm.gz
+
+# Additional Rust artifacts
+**/*.orig
+**/criterion/
+**/tarpaulin/
+**/kcov/
+
+# WebAssembly files
+*.wasm
+*.wasm.gz
+*.wat
+
+# Additional DFX artifacts
+.dfx/ic/
+.dfx/playground/
+.dfx/local/replica-configuration/
+wallet.json
+
+# Token testing artifacts
+test-ledger-canister.wasm
+ledger-canister.wasm
+
+# Documentation build
+docs/_build/
+site/
+target/doc/
+
+# Flamegraph profiling
+flamegraph.svg
+perf.data*
+
+# Benchmarking
+criterion/
+target/criterion/
+
+# IDE language servers
+.metals/
+.bloop/
+.ammonite/
+.scala-build/
+
+# Additional Python (for development tools)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Additional security files
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+*.jks
+*.keystore
+*.truststore
+
+# Package management
+.pnp.*
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.cjs
+.pnp.loader.mjs
+
+# Testing and coverage
+junit.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Development databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Archive files
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
