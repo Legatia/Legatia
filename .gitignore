@@ -22,9 +22,10 @@ canister_ids.json
 .vessel/
 .moc/
 
-# Generated files
+# Generated files  
 **/declarations/
 src/declarations/
+**/src/declarations/
 
 # Rust
 target/
@@ -147,6 +148,8 @@ Legatia_token/.env
 Legatia_token/Cargo.lock
 Legatia_token/**/*.wasm
 Legatia_token/**/*.wasm.gz
+Legatia_token/.ic-assets.json5
+Legatia_token/dfx.log
 
 # Additional Rust artifacts
 **/*.orig
