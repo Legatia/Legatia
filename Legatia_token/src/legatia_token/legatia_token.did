@@ -1,0 +1,83 @@
+type Account = record {
+    owner : principal;
+    subaccount : opt blob;
+};
+
+type TransferArgs = record {
+    from_subaccount : opt blob;
+    to : Account;
+    amount : nat;
+    fee : opt nat;
+    memo : opt blob;
+    created_at_time : opt nat64;
+};
+
+type TransferError = variant {
+    BadFee : record { expected_fee : nat };
+    BadBurn : record { min_burn_amount : nat };
+    InsufficientFunds : record { balance : nat };
+    TooOld;
+    CreatedInFuture : record { ledger_time : nat64 };
+    Duplicate : record { duplicate_of : nat };
+    TemporarilyUnavailable;
+    GenericError : record { error_code : nat; message : text };
+};
+
+type TransferResult = variant {
+    Ok : nat;
+    Err : TransferError;
+};
+
+type BalanceArgs = record {
+    account : Account;
+};
+
+type Value = variant {
+    Nat : nat;
+    Int : int;
+    Text : text;
+    Blob : blob;
+};
+
+type MetadataEntry = record {
+    0 : text;
+    1 : Value;
+};
+
+type SupportedStandard = record {
+    name : text;
+    url : text;
+};
+
+type TokenInitArgs = record {
+    name : text;
+    symbol : text;
+    decimals : nat8;
+    total_supply : nat;
+    fee : nat;
+    minting_account : Account;
+    initial_balances : vec record { Account; nat };
+};
+
+service : (TokenInitArgs) -> {
+    // ICRC-1 Standard Methods
+    icrc1_name : () -> (text) query;
+    icrc1_symbol : () -> (text) query;
+    icrc1_decimals : () -> (nat8) query;
+    icrc1_fee : () -> (nat) query;
+    icrc1_metadata : () -> (vec MetadataEntry) query;
+    icrc1_total_supply : () -> (nat) query;
+    icrc1_minting_account : () -> (opt Account) query;
+    icrc1_balance_of : (BalanceArgs) -> (nat) query;
+    icrc1_transfer : (TransferArgs) -> (TransferResult);
+    icrc1_supported_standards : () -> (vec SupportedStandard) query;
+
+    // Administrative Methods (for token economics)
+    mint : (to : Account, amount : nat) -> (TransferResult);
+    burn : (from : Account, amount : nat) -> (TransferResult);
+    set_fee : (new_fee : nat) -> ();
+    
+    // Legatia-specific Methods
+    reward_user : (user : Account, amount : nat, reason : text) -> (TransferResult);
+    get_reward_stats : (user : Account) -> (record { total_rewards : nat; last_reward : opt nat64; reward_count : nat64 }) query;
+}

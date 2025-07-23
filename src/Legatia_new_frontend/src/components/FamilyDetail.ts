@@ -8,19 +8,22 @@ export class FamilyDetail {
   private onAddMember: (familyId: string) => void;
   private onAddEvent: (familyId: string, memberId: string) => void;
   private onFamilyUpdate: (family: Family) => void;
+  private onSearchUsers: (familyId: string, familyName: string) => void;
 
   constructor(
     family: Family,
     onBack: () => void,
     onAddMember: (familyId: string) => void,
     onAddEvent: (familyId: string, memberId: string) => void,
-    onFamilyUpdate: (family: Family) => void
+    onFamilyUpdate: (family: Family) => void,
+    onSearchUsers: (familyId: string, familyName: string) => void
   ) {
     this.family = family;
     this.onBack = onBack;
     this.onAddMember = onAddMember;
     this.onAddEvent = onAddEvent;
     this.onFamilyUpdate = onFamilyUpdate;
+    this.onSearchUsers = onSearchUsers;
   }
 
   private formatTimestamp(timestamp: bigint): string {
@@ -139,9 +142,14 @@ export class FamilyDetail {
         <div class="family-detail-header">
           <button @click=${this.onBack} class="btn-back">← Back to Families</button>
           <h2>${family.name}</h2>
-          <button @click=${() => this.onAddMember(family.id)} class="btn-primary">
-            Add Family Member
-          </button>
+          <div class="header-actions">
+            <button @click=${() => this.onAddMember(family.id)} class="btn-primary">
+              Add Family Member
+            </button>
+            <button @click=${() => this.onSearchUsers(family.id, family.name)} class="btn-secondary">
+              🔍 Invite Existing Users
+            </button>
+          </div>
         </div>
 
         <div class="family-info">

@@ -7,19 +7,25 @@ export class ProfileDisplay {
   private onViewFamilies: () => void;
   private onViewClaimRequests: () => void;
   private onViewAdminClaims: () => void;
+  private onViewMyInvitations: () => void;
+  private onViewNotifications: () => void;
 
   constructor(
     profile: UserProfile, 
     onEdit: () => void, 
     onViewFamilies: () => void,
     onViewClaimRequests: () => void,
-    onViewAdminClaims: () => void
+    onViewAdminClaims: () => void,
+    onViewMyInvitations: () => void,
+    onViewNotifications: () => void
   ) {
     this.profile = profile;
     this.onEdit = onEdit;
     this.onViewFamilies = onViewFamilies;
     this.onViewClaimRequests = onViewClaimRequests;
     this.onViewAdminClaims = onViewAdminClaims;
+    this.onViewMyInvitations = onViewMyInvitations;
+    this.onViewNotifications = onViewNotifications;
   }
 
   private formatDate(dateString: string): string {
@@ -96,6 +102,19 @@ export class ProfileDisplay {
           <button @click=${this.onViewFamilies} class="btn-primary">
             Manage Families
           </button>
+        </div>
+
+        <div class="invitations-section">
+          <h3>📨 Family Invitations</h3>
+          <p>View and manage your family invitations and notifications.</p>
+          <div class="invitation-actions">
+            <button @click=${this.onViewMyInvitations} class="btn-secondary">
+              📨 My Invitations
+            </button>
+            <button @click=${this.onViewNotifications} class="btn-secondary">
+              🔔 Notifications
+            </button>
+          </div>
         </div>
 
         <div class="ghost-profile-section">

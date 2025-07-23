@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "canisters": {
+    "legatia_token": {
+      "type": "rust",
+      "package": "legatia_token",
+      "candid": "src/legatia_token/legatia_token.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "providers": ["https://ic0.app"],
+      "type": "persistent"
+    }
+  }
+}

@@ -3,12 +3,12 @@ use std::cell::RefCell;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
 
-use crate::types::{UserProfile, Family, UserFamilyList, ClaimRequest};
+use crate::types::{UserProfile, Family, UserFamilyList, ClaimRequest, FamilyInvitation, Notification, UserSearchResult};
 
 pub type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
+    pub static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
 
@@ -33,6 +33,24 @@ thread_local! {
     pub static CLAIM_REQUESTS: RefCell<StableBTreeMap<String, ClaimRequest, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3)))
+        )
+    );
+
+    pub static INVITATIONS: RefCell<StableBTreeMap<String, FamilyInvitation, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(4)))
+        )
+    );
+
+    pub static NOTIFICATIONS: RefCell<StableBTreeMap<String, Notification, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(5)))
+        )
+    );
+
+    pub static USER_SEARCH_INDEX: RefCell<StableBTreeMap<String, UserSearchResult, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(6)))
         )
     );
 }
