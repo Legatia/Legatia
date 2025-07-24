@@ -62,7 +62,7 @@ pub fn update_user_search_index(profile: &UserProfile, principal: Principal) {
         id: profile.id.clone(),
         full_name: profile.full_name.clone(),
         surname_at_birth: profile.surname_at_birth.clone(),
-        principal,
+        user_principal: principal,
     };
     
     USER_SEARCH_INDEX.with(|index| {
@@ -79,7 +79,6 @@ pub fn update_user_search_index(profile: &UserProfile, principal: Principal) {
     });
 }
 
-#[query]
 pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
     // Validate search query
     if let Err(_validation_error) = crate::validation::validate_search_query(&query) {
@@ -93,28 +92,28 @@ pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
     USER_SEARCH_INDEX.with(|index| {
         for (_key, user) in index.borrow().iter() {
             // Avoid duplicates
-            if seen_principals.contains(&user.principal) {
+            if seen_principals.contains(&user.user_principal) {
                 continue;
             }
             
             // Search by ID exact match
             if user.id.to_lowercase().contains(&query_lower) {
                 results.push(user.clone());
-                seen_principals.insert(user.principal);
+                seen_principals.insert(user.user_principal);
                 continue;
             }
             
             // Search by name
             if user.full_name.to_lowercase().contains(&query_lower) {
                 results.push(user.clone());
-                seen_principals.insert(user.principal);
+                seen_principals.insert(user.user_principal);
                 continue;
             }
             
             // Search by surname
             if user.surname_at_birth.to_lowercase().contains(&query_lower) {
                 results.push(user.clone());
-                seen_principals.insert(user.principal);
+                seen_principals.insert(user.user_principal);
             }
         }
     });
@@ -125,7 +124,6 @@ pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
 }
 
 // Family Invitation Functions
-#[update]
 pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, String> {
     let caller = api::caller();
     
@@ -147,7 +145,7 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
     
     // Check if user is already a family member
     if family.members.iter().any(|member| {
-        member.profile_principal == Some(target_user.principal)
+        member.profile_principal == Some(target_user.user_principal)
     }) {
         return Err("User is already a member of this family".to_string());
     }
@@ -156,7 +154,7 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
     let existing_invitation = INVITATIONS.with(|invitations| {
         invitations.borrow().iter().find(|(_, inv)| {
             inv.family_id == request.family_id && 
-            inv.invitee == target_user.principal && 
+            inv.invitee == target_user.user_principal && 
             matches!(inv.status, InvitationStatus::Pending)
         }).map(|(_, inv)| inv)
     });
@@ -176,7 +174,7 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
         family_name: family.name.clone(),
         inviter: caller,
         inviter_name: inviter_profile.full_name.clone(),
-        invitee: target_user.principal,
+        invitee: target_user.user_principal,
         invitee_id: target_user.id.clone(),
         message: request.message.clone(),
         created_at: api::time(),
@@ -200,7 +198,7 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
     );
     
     create_notification(
-        target_user.principal,
+        target_user.user_principal,
         notification_title,
         notification_message,
         NotificationType::FamilyInvitation,
@@ -211,7 +209,6 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
     Ok(invitation_id)
 }
 
-#[update]
 pub fn process_family_invitation(request: ProcessInvitationRequest) -> Result<String, String> {
     let caller = api::caller();
     
@@ -317,7 +314,6 @@ pub fn process_family_invitation(request: ProcessInvitationRequest) -> Result<St
     Ok(format!("Invitation {}", status))
 }
 
-#[query]
 pub fn get_my_invitations() -> Result<Vec<FamilyInvitation>, String> {
     let caller = api::caller();
     
@@ -332,7 +328,6 @@ pub fn get_my_invitations() -> Result<Vec<FamilyInvitation>, String> {
     Ok(invitations)
 }
 
-#[query]
 pub fn get_sent_invitations() -> Result<Vec<FamilyInvitation>, String> {
     let caller = api::caller();
     
@@ -348,7 +343,6 @@ pub fn get_sent_invitations() -> Result<Vec<FamilyInvitation>, String> {
 }
 
 // Notification Functions
-#[query]
 pub fn get_my_notifications() -> Result<Vec<Notification>, String> {
     let caller = api::caller();
     
@@ -363,7 +357,6 @@ pub fn get_my_notifications() -> Result<Vec<Notification>, String> {
     Ok(notifications)
 }
 
-#[query]
 pub fn get_unread_notification_count() -> Result<u64, String> {
     let caller = api::caller();
     
@@ -377,7 +370,6 @@ pub fn get_unread_notification_count() -> Result<u64, String> {
     Ok(count)
 }
 
-#[update]
 pub fn mark_notification_read(notification_id: String) -> Result<String, String> {
     let caller = api::caller();
     
@@ -398,7 +390,6 @@ pub fn mark_notification_read(notification_id: String) -> Result<String, String>
     Ok("Notification marked as read".to_string())
 }
 
-#[update]
 pub fn mark_all_notifications_read() -> Result<String, String> {
     let caller = api::caller();
     let mut count = 0;

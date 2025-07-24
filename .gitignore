@@ -267,3 +267,89 @@ stress-test-logs/
 .vscode/launch.json
 .idea/workspace.xml
 .idea/tasks.xml
+
+# AI/ML development artifacts
+.claude/
+.cursor/
+.codeium/
+ai-logs/
+*.ai-backup
+
+# Modern JavaScript/TypeScript tooling
+.turbo/
+.vercel/
+.netlify/
+.swc/
+.webpack/
+.rollup.cache/
+.babel_cache/
+.tsc_cache/
+
+# Additional Rust development
+.cargo/
+rust-analyzer/
+.rustc_info.json
+.cargo-ok
+
+# DFX additional artifacts
+.dfx/mainnet/
+.dfx/testnet/
+.dfx/ic_consensus_pool/
+.dfx/state/
+.dfx/tmp/
+dfx_config_backup.json
+
+# Candid interface backups and generated files
+*.did.backup
+*.did.old
+candid_cache/
+interface_cache/
+
+# Development containers and Docker
+.devcontainer/
+.docker/
+docker-compose.override.yml
+.dockerignore.bak
+
+# GitHub Codespaces
+.vscode/extensions.json
+.github/codespaces/
+
+# Additional security and sensitive files
+*.secrets
+.env.secrets
+config/secrets.json
+wallet_backup/
+identity_backup/
+*.recovery
+
+# Performance and profiling
+flamegraph/
+profiling_output/
+memory_dumps/
+*.prof
+*.heap
+*.cpuprofile
+
+# macOS specific
+.Trashes
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+
+# Windows specific  
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Temporary development files
+TODO.md.bak
+NOTES.md.tmp
+scratch/
+playground/
+experiments/

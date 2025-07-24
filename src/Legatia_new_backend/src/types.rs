@@ -212,7 +212,7 @@ pub struct UserSearchResult {
     pub id: String,
     pub full_name: String,
     pub surname_at_birth: String,
-    pub principal: Principal,
+    pub user_principal: Principal,
 }
 
 // Unified Notification Types

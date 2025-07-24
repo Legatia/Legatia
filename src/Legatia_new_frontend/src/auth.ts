@@ -92,8 +92,8 @@ class AuthService {
     // Use appropriate host based on environment and avoid CSP issues
     let agentHost: string;
     if (process.env.DFX_NETWORK === 'local') {
-      const currentHost = window.location.origin;
-      agentHost = currentHost.includes('localhost:4943') ? currentHost : 'http://localhost:4943';
+      // Always use the current origin to avoid CSP issues
+      agentHost = window.location.origin;
     } else {
       agentHost = 'https://ic0.app';
     }
@@ -131,9 +131,8 @@ class AuthService {
     console.log('Setting up dev actor with canister ID:', process.env.CANISTER_ID_LEGATIA_NEW_BACKEND);
     console.log('Using authenticated principal for dev mode');
     
-    // Use appropriate host to avoid CSP issues
-    const currentHost = window.location.origin;
-    const agentHost = currentHost.includes('localhost:4943') ? currentHost : 'http://localhost:4943';
+    // Use current origin to avoid CSP issues
+    const agentHost = window.location.origin;
     
     // Create agent with proper configuration
     const agent = new HttpAgent({
