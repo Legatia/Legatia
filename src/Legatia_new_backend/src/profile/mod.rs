@@ -14,6 +14,20 @@ pub fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, Stri
         return Err("Authentication required".to_string());
     }
 
+    // Validate input fields
+    if let Err(_) = crate::validation::validate_name(&request.full_name, "full_name") {
+        return Err("Invalid full name format".to_string());
+    }
+    if let Err(_) = crate::validation::validate_name(&request.surname_at_birth, "surname_at_birth") {
+        return Err("Invalid surname format".to_string());
+    }
+    if let Err(_) = crate::validation::validate_name(&request.birth_city, "birth_city") {
+        return Err("Invalid birth city format".to_string());
+    }
+    if let Err(_) = crate::validation::validate_name(&request.birth_country, "birth_country") {
+        return Err("Invalid birth country format".to_string());
+    }
+
     let current_time = api::time();
     
     // Generate unique user ID

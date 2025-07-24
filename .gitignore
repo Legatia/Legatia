@@ -26,6 +26,7 @@ canister_ids.json
 **/declarations/
 src/declarations/
 **/src/declarations/
+**/.ic-assets.json5
 
 # Rust
 target/
@@ -69,6 +70,7 @@ public/
 logs/
 lerna-debug.log*
 dfx.log
+**/dfx.log
 
 # Test coverage
 coverage/
@@ -151,6 +153,10 @@ Legatia_token/**/*.wasm.gz
 Legatia_token/.ic-assets.json5
 Legatia_token/dfx.log
 
+# Frontend build artifacts
+src/Legatia_new_frontend/dist/.ic-assets.json5
+src/Legatia_new_frontend/assets/.ic-assets.json5
+
 # Additional Rust artifacts
 **/*.orig
 **/criterion/
@@ -166,7 +172,9 @@ Legatia_token/dfx.log
 .dfx/ic/
 .dfx/playground/
 .dfx/local/replica-configuration/
+.dfx/local/canister_ids.json
 wallet.json
+.dfx/version
 
 # Token testing artifacts
 test-ledger-canister.wasm
@@ -243,3 +251,19 @@ cover/
 *.tgz
 *.rar
 *.7z
+
+# Security testing artifacts
+burp-collaborator/
+nmap-scan*
+security-test-results/
+vuln-scan*
+
+# Performance testing
+load-test-results/
+stress-test-logs/
+
+# IDE and editor artifacts
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+.idea/tasks.xml

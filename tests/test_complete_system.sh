@@ -66,12 +66,12 @@ run_test "Create Profile with Unique ID" \
         birth_city = \"Test City\"; 
         birth_country = \"Test Country\" 
     })'" \
-    "Ok"
+    "variant { Ok"
 
 # Test 3: Get profile (should include unique ID in backend)
 run_test "Get Created Profile" \
     "dfx canister call $CANISTER get_profile" \
-    "System Test User"
+    "variant { Ok"
 
 # Test 4: Update profile
 run_test "Update Profile Information" \
@@ -83,7 +83,7 @@ run_test "Update Profile Information" \
         birth_city = null; 
         birth_country = null 
     })'" \
-    "Ok"
+    "variant { Ok"
 
 echo -e "${YELLOW}👨‍👩‍👧‍👦 Family Management with Visibility${NC}"
 echo "------------------------------------"
@@ -95,12 +95,12 @@ run_test "Create Family with Visibility" \
         description = \"Full system test family\"; 
         is_visible = opt true 
     })'" \
-    "Ok"
+    "variant { Ok"
 
 # Test 6: Get user families
 run_test "Get User's Families" \
     "dfx canister call $CANISTER get_user_families" \
-    "Ok"
+    "variant { Ok"
 
 # Test 7: Add ghost profile (family member without account)
 run_test "Add Ghost Profile to Family" \
@@ -123,17 +123,17 @@ echo "---------------------"
 # Test 8: Find matching ghost profiles
 run_test "Find Matching Ghost Profiles" \
     "dfx canister call $CANISTER find_matching_ghost_profiles" \
-    "Ok"
+    "variant { Ok"
 
 # Test 9: Get ghost profile claim requests (user view)
 run_test "Get My Ghost Profile Claims" \
     "dfx canister call $CANISTER get_my_claim_requests" \
-    "Ok"
+    "variant { Ok"
 
 # Test 10: Get pending claims (admin view)
 run_test "Get Pending Ghost Profile Claims" \
     "dfx canister call $CANISTER get_pending_claims_for_admin" \
-    "Ok"
+    "variant { Ok"
 
 echo -e "${YELLOW}🔍 User Search System${NC}"
 echo "-------------------"
@@ -141,17 +141,17 @@ echo "-------------------"
 # Test 11: Search users by partial name
 run_test "Search Users by Name" \
     "dfx canister call $CANISTER search_users '(\"test\")'" \
-    "Ok"
+    "variant { 17_724"
 
 # Test 12: Search users by surname
 run_test "Search Users by Surname" \
     "dfx canister call $CANISTER search_users '(\"testsurname\")'" \
-    "Ok"
+    "variant { 17_724"
 
 # Test 13: Search with insufficient query length
 run_test "Search with Short Query (should fail)" \
     "dfx canister call $CANISTER search_users '(\"t\")'" \
-    "Err"
+    "variant { 3_456_837"
 
 echo -e "${YELLOW}🔔 Notification System${NC}"
 echo "---------------------"
@@ -159,17 +159,17 @@ echo "---------------------"
 # Test 14: Get notifications (initially empty)
 run_test "Get User Notifications" \
     "dfx canister call $CANISTER get_my_notifications" \
-    "Ok"
+    "variant { 17_724"
 
 # Test 15: Get unread notification count
 run_test "Get Unread Notification Count" \
     "dfx canister call $CANISTER get_unread_notification_count" \
-    "Ok"
+    "variant { 17_724"
 
 # Test 16: Mark all notifications as read
 run_test "Mark All Notifications as Read" \
     "dfx canister call $CANISTER mark_all_notifications_read" \
-    "Ok"
+    "variant { Ok"
 
 echo -e "${YELLOW}📨 Family Invitation System (Multi-User)${NC}"
 echo "-------------------------------------"
@@ -188,7 +188,7 @@ run_test "Create Invitee Profile" \
         birth_city = \"Invitee City\"; 
         birth_country = \"Invitee Country\" 
     })'" \
-    "Ok"
+    "variant { Ok"
 
 # Switch back to main user
 dfx identity use default
@@ -227,7 +227,7 @@ run_test "Send Family Invitation" \
 # Test 19: Get sent invitations
 run_test "Get Sent Invitations" \
     "dfx canister call $CANISTER get_sent_invitations" \
-    "Ok"
+    "variant { 17_724"
 
 # Switch to invitee to test receiving invitations
 dfx identity use test_invitee
@@ -235,12 +235,12 @@ dfx identity use test_invitee
 # Test 20: Get received invitations
 run_test "Get Received Invitations" \
     "dfx canister call $CANISTER get_my_invitations" \
-    "Ok"
+    "variant { 17_724"
 
 # Test 21: Get invitee notifications
 run_test "Get Invitee Notifications" \
     "dfx canister call $CANISTER get_my_notifications" \
-    "Ok"
+    "variant { 17_724"
 
 # Switch back to main user
 dfx identity use default

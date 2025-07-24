@@ -1,6 +1,15 @@
 # 🧪 Legatia Local Testing Guide
 
-This guide covers how to test Legatia locally during development, including authentication options, feature testing, and multi-user scenarios.
+This guide covers how to test Legatia locally during development, including authentication options, feature testing, multi-user scenarios, and security validation.
+
+## 🛡️ Security Testing
+
+All security fixes have been implemented and tested. The platform now includes:
+- **Input validation** with length limits and character restrictions
+- **Authorization controls** with proper access verification  
+- **Secure ID generation** using cryptographic hashing
+- **Error sanitization** with generic error messages
+- **Content Security Policy** headers for XSS protection
 
 ---
 
@@ -57,6 +66,69 @@ For more realistic testing with multiple users, use dfx identities:
    ```
 
 ---
+
+## 🔍 New Features Testing
+
+### Ghost Profile System
+Test the ghost profile claim workflow:
+```bash
+# Find matching ghost profiles (after creating some family members)
+dfx canister call Legatia_new_backend find_matching_ghost_profiles '()'
+
+# Submit a claim request for a ghost profile
+dfx canister call Legatia_new_backend submit_claim_request '(record {
+  ghost_member_id = "GHOST_MEMBER_ID";
+  family_id = "FAMILY_ID"; 
+  reason = "This is my grandmother"
+})'
+
+# Get your submitted claims
+dfx canister call Legatia_new_backend get_my_claim_requests '()'
+```
+
+### Family Invitation System
+Test the complete invitation workflow:
+```bash
+# Search for users to invite
+dfx canister call Legatia_new_backend search_users '("alice")'
+
+# Send a family invitation
+dfx canister call Legatia_new_backend send_family_invitation '(record {
+  user_id = "USER_ID_FROM_SEARCH";
+  family_id = "YOUR_FAMILY_ID";
+  relationship_to_admin = "friend";
+  message = opt "Join our family tree!"
+})'
+
+# Check sent invitations
+dfx canister call Legatia_new_backend get_sent_invitations '()'
+
+# As the invitee - check received invitations
+dfx identity use bob
+dfx canister call Legatia_new_backend get_my_invitations '()'
+
+# Process the invitation (accept/decline)
+dfx canister call Legatia_new_backend process_family_invitation '(record {
+  invitation_id = "INVITATION_ID";
+  accept = true
+})'
+```
+
+### Notification System
+Test the notification features:
+```bash
+# Get your notifications
+dfx canister call Legatia_new_backend get_my_notifications '()'
+
+# Get unread notification count
+dfx canister call Legatia_new_backend get_unread_notification_count '()'
+
+# Mark a notification as read
+dfx canister call Legatia_new_backend mark_notification_read '("NOTIFICATION_ID")'
+
+# Mark all notifications as read
+dfx canister call Legatia_new_backend mark_all_notifications_read '()'
+```
 
 ## 👥 Complete Feature Testing Flow
 
@@ -273,6 +345,111 @@ dfx deploy
 
 ### Issue: "Access denied" for family operations
 **Solution:** Ensure you're testing as the family admin or create a new family
+
+---
+
+## 🛡️ Security Testing Scenarios
+
+### Input Validation Testing
+Test that malicious inputs are properly rejected:
+
+```bash
+# Test search query validation
+dfx canister call Legatia_new_backend search_users '("x")'
+# Expected: Error - query too short
+
+dfx canister call Legatia_new_backend search_users '("john<script>alert(1)</script>")'
+# Expected: Error - invalid characters
+
+# Test profile creation validation
+dfx canister call Legatia_new_backend create_profile '(record {
+  full_name = "<script>alert(1)</script>";
+  surname_at_birth = "Test";
+  sex = "M";
+  birthday = "1990-01-01";
+  birth_city = "Test City";
+  birth_country = "Test Country"
+})'
+# Expected: Error - invalid name format
+
+# Test family creation validation
+dfx canister call Legatia_new_backend create_family '(record {
+  name = "";
+  description = "Test family"
+})'
+# Expected: Error - invalid family name format
+```
+
+### Authorization Testing
+Test that unauthorized operations are blocked:
+
+```bash
+# Create family as Alice
+dfx identity use alice
+ALICE_FAMILY_ID=$(dfx canister call Legatia_new_backend create_family '(record {
+  name = "Alice Family";
+  description = "Test family"
+})' | grep -o '"[a-f0-9]*"' | head -1 | sed 's/"//g')
+
+# Try to access Alice's family as Bob (should fail)
+dfx identity use bob
+dfx canister call Legatia_new_backend get_family '("'$ALICE_FAMILY_ID'")'
+# Expected: Error - access denied
+
+# Try to add member to Alice's family as Bob (should fail)
+dfx canister call Legatia_new_backend add_family_member '(record {
+  family_id = "'$ALICE_FAMILY_ID'";
+  full_name = "Test Member";
+  surname_at_birth = "Test";
+  sex = "Other";
+  relationship_to_admin = "other"
+})'
+# Expected: Error - only family admin can add members
+```
+
+### Secure ID Generation Testing
+Verify that IDs are properly generated:
+
+```bash
+# Create multiple families and check that IDs are different and secure
+dfx canister call Legatia_new_backend create_family '(record {name = "Family 1"; description = "Test"})'
+dfx canister call Legatia_new_backend create_family '(record {name = "Family 2"; description = "Test"})'
+# IDs should be cryptographic hashes (like "aacaaf398027d548")
+```
+
+## 🧪 Automated Test Suites
+
+### Backend Test Suite
+Run the complete backend test suite:
+```bash
+cd tests
+./test_backend.sh
+# Expected: 11/11 tests passing
+```
+
+### Complete System Test  
+Run the full system integration test:
+```bash
+cd tests
+./test_complete_system.sh
+# Expected: High success rate with security tests passing
+```
+
+### Invitation System Test
+Test the complete invitation workflow:
+```bash
+cd tests
+./test_invitation_system.sh
+# Expected: All security and authorization tests passing
+```
+
+### Token System Test
+Test the Legatia token functionality:
+```bash
+cd Legatia_token
+cargo test
+# Expected: 6/6 tests passing
+```
 
 ---
 

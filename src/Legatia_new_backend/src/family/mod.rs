@@ -16,6 +16,14 @@ pub fn create_family(request: CreateFamilyRequest) -> Result<Family, String> {
         return Err("Authentication required".to_string());
     }
 
+    // Validate input fields
+    if let Err(_) = crate::validation::validate_name(&request.name, "family_name") {
+        return Err("Invalid family name format".to_string());
+    }
+    if let Err(_) = crate::validation::validate_description(&request.description) {
+        return Err("Invalid description format".to_string());
+    }
+
     // Check if user has a profile
     PROFILES.with(|profiles| {
         let profiles = profiles.borrow();
@@ -94,8 +102,16 @@ pub fn get_family(family_id: String) -> Result<Family, String> {
                 if family.admin == caller {
                     Ok(family)
                 } else {
-                    // TODO: Check if user is a member
-                    Err("Access denied: You are not a member of this family".to_string())
+                    // Check if user is a member of the family
+                    let is_member = family.members.iter().any(|member| {
+                        member.profile_principal == Some(caller)
+                    });
+                    
+                    if is_member {
+                        Ok(family)
+                    } else {
+                        Err("Access denied: You are not a member of this family".to_string())
+                    }
                 }
             }
             None => Err("Family not found".to_string()),

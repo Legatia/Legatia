@@ -81,8 +81,9 @@ pub fn update_user_search_index(profile: &UserProfile, principal: Principal) {
 
 #[query]
 pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
-    if query.len() < 2 {
-        return Err("Search query must be at least 2 characters".to_string());
+    // Validate search query
+    if let Err(_validation_error) = crate::validation::validate_search_query(&query) {
+        return Err("Invalid search query format".to_string());
     }
     
     let query_lower = query.to_lowercase();
@@ -90,7 +91,7 @@ pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
     let mut seen_principals = std::collections::HashSet::new();
     
     USER_SEARCH_INDEX.with(|index| {
-        for (key, user) in index.borrow().iter() {
+        for (_key, user) in index.borrow().iter() {
             // Avoid duplicates
             if seen_principals.contains(&user.principal) {
                 continue;

@@ -66,7 +66,7 @@ class App {
       }
     } catch (error) {
       console.error('Initialization failed:', error);
-      this.error = 'Failed to initialize application';
+      this.error = 'Failed to initialize application. Please try again.';
       this.currentView = 'error';
     }
     
@@ -107,7 +107,7 @@ class App {
       if (error instanceof Error && error.message.includes('Profile not found')) {
         this.currentView = 'create-profile';
       } else {
-        this.error = `Failed to load profile: ${error}`;
+        this.error = 'Failed to load profile. Please try again.';
         this.currentView = 'error';
       }
     } finally {
@@ -779,7 +779,7 @@ class App {
             <img src="${legatiaLogo}" alt="Legatia Family Tree" class="header-logo" />
             ${this.isAuthenticated ? html`
               <div class="user-info">
-                <span>Principal: ${authService.getPrincipal()?.toString()}</span>
+                <span>Logged in</span>
                 <button @click=${this.handleLogout} class="btn-secondary">Logout</button>
               </div>
             ` : ''}

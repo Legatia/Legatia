@@ -18,6 +18,7 @@ mod profile;
 mod family;
 mod ghost;
 mod invitations;
+mod validation;
 
 // Re-export types for Candid interface
 pub use types::*;
