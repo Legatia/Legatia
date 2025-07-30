@@ -4,7 +4,7 @@ use ic_cdk_macros::*;
 
 use crate::types::{
     Family, FamilyMember, FamilyEvent, CreateFamilyRequest, AddFamilyMemberRequest, 
-    AddEventRequest, DEV_MODE
+    AddEventRequest, UpdateFamilyMemberRequest, UpdateEventRequest, DEV_MODE
 };
 use crate::storage::{PROFILES, FAMILIES, USER_FAMILIES, generate_id};
 
@@ -326,4 +326,135 @@ pub fn update_family_internal(family: Family) -> Result<(), String> {
 
 pub fn generate_member_id() -> String {
     format!("member_{}", api::time())
+}
+
+#[update]
+pub fn update_family_member(request: UpdateFamilyMemberRequest) -> Result<FamilyMember, String> {
+    let caller = api::caller();
+    
+    if !DEV_MODE && caller == Principal::anonymous() {
+        return Err("Authentication required".to_string());
+    }
+
+    let current_time = api::time();
+
+    FAMILIES.with(|families| {
+        let mut families = families.borrow_mut();
+        match families.get(&request.family_id) {
+            Some(mut family) => {
+                // Check if caller is admin
+                if family.admin != caller {
+                    return Err("Only family admin can update member profiles".to_string());
+                }
+                
+                // Find the member to update and check permissions first
+                let member_result = family.members.iter_mut().find(|m| m.id == request.member_id);
+                if let Some(member) = member_result {
+                    // Only allow updating ghost profiles (members without linked principals)
+                    if member.profile_principal.is_some() {
+                        return Err("Cannot update linked member profiles. Only ghost profiles can be edited.".to_string());
+                    }
+                    
+                    // Update fields if provided
+                    if let Some(full_name) = request.full_name {
+                        member.full_name = full_name;
+                    }
+                    if let Some(surname_at_birth) = request.surname_at_birth {
+                        member.surname_at_birth = surname_at_birth;
+                    }
+                    if let Some(sex) = request.sex {
+                        member.sex = sex;
+                    }
+                    if let Some(birthday) = request.birthday {
+                        member.birthday = Some(birthday);
+                    }
+                    if let Some(birth_city) = request.birth_city {
+                        member.birth_city = Some(birth_city);
+                    }
+                    if let Some(birth_country) = request.birth_country {
+                        member.birth_country = Some(birth_country);
+                    }
+                    if let Some(death_date) = request.death_date {
+                        member.death_date = Some(death_date);
+                    }
+                    if let Some(relationship_to_admin) = request.relationship_to_admin {
+                        member.relationship_to_admin = relationship_to_admin;
+                    }
+                    
+                    let updated_member = member.clone();
+                    
+                    family.updated_at = current_time;
+                    families.insert(request.family_id, family);
+                    
+                    Ok(updated_member)
+                } else {
+                    Err("Member not found in family".to_string())
+                }
+            }
+            None => Err("Family not found".to_string()),
+        }
+    })
+}
+
+#[update]
+pub fn update_member_event(request: UpdateEventRequest) -> Result<FamilyEvent, String> {
+    let caller = api::caller();
+    
+    if !DEV_MODE && caller == Principal::anonymous() {
+        return Err("Authentication required".to_string());
+    }
+
+    let current_time = api::time();
+
+    FAMILIES.with(|families| {
+        let mut families = families.borrow_mut();
+        match families.get(&request.family_id) {
+            Some(mut family) => {
+                // Check if caller is admin or event creator
+                if family.admin != caller {
+                    return Err("Only family admin can update events".to_string());
+                }
+                
+                // Find the member first
+                let member_index = family.members.iter().position(|m| m.id == request.member_id);
+                if let Some(member_idx) = member_index {
+                    let member = &mut family.members[member_idx];
+                    if let Some(event) = member.events.iter_mut().find(|e| e.id == request.event_id) {
+                        // Update event fields if provided
+                        if let Some(title) = request.title {
+                            event.title = title;
+                        }
+                        if let Some(description) = request.description {
+                            event.description = description;
+                        }
+                        let mut needs_sort = false;
+                        if let Some(event_date) = request.event_date {
+                            event.event_date = event_date;
+                            needs_sort = true;
+                        }
+                        if let Some(event_type) = request.event_type {
+                            event.event_type = event_type;
+                        }
+                        
+                        let updated_event = event.clone();
+                        
+                        // Re-sort events by date after updating if date changed
+                        if needs_sort {
+                            member.events.sort_by(|a, b| a.event_date.cmp(&b.event_date));
+                        }
+                        
+                        family.updated_at = current_time;
+                        families.insert(request.family_id, family);
+                        
+                        Ok(updated_event)
+                    } else {
+                        Err("Event not found".to_string())
+                    }
+                } else {
+                    Err("Member not found in family".to_string())
+                }
+            }
+            None => Err("Family not found".to_string()),
+        }
+    })
 }

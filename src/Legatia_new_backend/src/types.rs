@@ -127,6 +127,31 @@ pub struct AddEventRequest {
     pub event_type: String,
 }
 
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct UpdateFamilyMemberRequest {
+    pub family_id: String,
+    pub member_id: String,
+    pub full_name: Option<String>,
+    pub surname_at_birth: Option<String>,
+    pub sex: Option<String>,
+    pub birthday: Option<String>,
+    pub birth_city: Option<String>,
+    pub birth_country: Option<String>,
+    pub death_date: Option<String>,
+    pub relationship_to_admin: Option<String>,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct UpdateEventRequest {
+    pub family_id: String,
+    pub member_id: String,
+    pub event_id: String,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub event_date: Option<String>,
+    pub event_type: Option<String>,
+}
+
 // Storage wrapper for Vec<String> to work around orphan rules
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct UserFamilyList(pub Vec<String>);

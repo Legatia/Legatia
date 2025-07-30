@@ -28,7 +28,7 @@ pub use profile::{create_profile, update_profile, get_profile, create_profile_wi
 pub use family::{
     create_family, get_user_families, get_family, add_family_member, 
     remove_family_member, add_member_event, get_member_events_chronological,
-    toggle_family_visibility
+    toggle_family_visibility, update_family_member, update_member_event
 };
 pub use ghost::{
     find_matching_ghost_profiles, submit_ghost_profile_claim, get_pending_claims_for_admin,

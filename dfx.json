@@ -13,7 +13,7 @@
         "src/Legatia_new_frontend/dist"
       ],
       "type": "assets",
-      "workspace": "Legatia_new_frontend"
+      "workspace": "src/Legatia_new_frontend"
     }
   },
   "defaults": {

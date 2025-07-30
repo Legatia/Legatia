@@ -1,4 +1,4 @@
-use ic_cdk::{api, query, update};
+use ic_cdk::api;
 use candid::{Principal};
 use ic_stable_structures::StableBTreeMap;
 use std::cell::RefCell;

@@ -154,8 +154,17 @@ Legatia_token/.ic-assets.json5
 Legatia_token/dfx.log
 
 # Frontend build artifacts
+src/Legatia_new_frontend/dist/
 src/Legatia_new_frontend/dist/.ic-assets.json5
 src/Legatia_new_frontend/assets/.ic-assets.json5
+**/dist/.ic-assets.json5
+**/assets/.ic-assets.json5
+
+# Frontend specific node_modules and build outputs
+src/Legatia_new_frontend/node_modules/
+src/Legatia_new_frontend/.vite/
+src/Legatia_new_frontend/coverage/
+src/Legatia_new_frontend/.nyc_output/
 
 # Additional Rust artifacts
 **/*.orig
@@ -302,8 +311,20 @@ dfx_config_backup.json
 # Candid interface backups and generated files
 *.did.backup
 *.did.old
+*.did.js.bak
+*.did.d.ts.old
 candid_cache/
 interface_cache/
+
+# Project specific generated directories (should usually be ignored)
+src/Legatia_new_frontend/src/declarations/
+src/Legatia_new_frontend_react/src/declarations/
+
+# React and Vite specific
+src/Legatia_new_frontend/.eslintcache
+src/Legatia_new_frontend_react/.eslintcache
+src/Legatia_new_frontend/vite.config.js.timestamp-*
+src/Legatia_new_frontend_react/vite.config.js.timestamp-*
 
 # Development containers and Docker
 .devcontainer/
@@ -353,3 +374,40 @@ NOTES.md.tmp
 scratch/
 playground/
 experiments/
+
+# Development and planning files (added during development)
+REACT_MIGRATION_PLAN.md.bak
+DAO_IMPLEMENTATION_PLAN.md.bak
+mobilePlan.md.bak
+*.md.backup
+dev-notes/
+planning/
+
+# Testing artifacts
+src/Legatia_new_frontend/test-results/
+src/Legatia_new_frontend/playwright-report/
+src/Legatia_new_frontend/coverage-report/
+**/*.test.js.map
+**/*.test.ts.map
+**/*.spec.js.map
+**/*.spec.ts.map
+
+# Hot reload and development server files
+.vite-hot-reload/
+hot-update.*
+*.hot-update.*
+
+# TypeScript incremental compilation
+src/Legatia_new_frontend/tsconfig.tsbuildinfo
+src/Legatia_new_frontend_react/tsconfig.tsbuildinfo
+*.tsbuildinfo.tmp
+
+# Package manager lock files (keeping specific versions)
+src/Legatia_new_frontend/package-lock.json.bak
+src/Legatia_new_frontend_react/package-lock.json.bak
+
+# Development environment specifics
+.env.development.local
+.env.production.local
+.env.test.local
+.dfx/network/local/canister_ids.json.bak
