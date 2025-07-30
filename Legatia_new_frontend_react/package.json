@@ -1,11 +1,11 @@
 {
-  "name": "Legatia_new_frontend",
+  "name": "legatia-new-frontend-react",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "VITE_CANISTER_ID_LEGATIA_NEW_BACKEND=${CANISTER_ID_LEGATIA_NEW_BACKEND:-uxrrr-q7777-77774-qaaaq-cai} vite build",
+    "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
