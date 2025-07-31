@@ -13,7 +13,7 @@ const INTERNET_IDENTITY_URL = DFX_NETWORK === 'local'
   : 'https://identity.ic0.app';
 
 // Development mode - set to true to bypass Internet Identity
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 class AuthService {
   private authClient: AuthClient | null = null;

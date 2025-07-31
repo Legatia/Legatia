@@ -34,7 +34,7 @@ type EditMemberFormData = z.infer<typeof editMemberSchema>;
 export const EditFamilyMemberPage: React.FC = () => {
   const { id: familyId, memberId } = useParams<{ id: string; memberId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, principal } = useAuth();
   const { currentFamily, loading, error, fetchFamily, updateFamilyMember, clearError } = useFamily();
 
   const {
@@ -61,7 +61,7 @@ export const EditFamilyMemberPage: React.FC = () => {
   }, [error, clearError]);
 
   const currentMember = currentFamily?.members?.find(m => m.id === memberId);
-  const isAdmin = currentFamily?.admin.toString() === user?.id;
+  const isAdmin = principal && currentFamily?.admin.toString() === principal.toString();
   const isGhostProfile = !currentMember?.profile_principal || currentMember.profile_principal.length === 0;
 
   // Populate form when member data is loaded

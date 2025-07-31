@@ -343,8 +343,9 @@ pub fn update_family_member(request: UpdateFamilyMemberRequest) -> Result<Family
         match families.get(&request.family_id) {
             Some(mut family) => {
                 // Check if caller is admin
+                ic_cdk::println!("DEBUG: Family admin: {:?}, Caller: {:?}", family.admin, caller);
                 if family.admin != caller {
-                    return Err("Only family admin can update member profiles".to_string());
+                    return Err(format!("Only family admin can update member profiles. Admin: {:?}, Caller: {:?}", family.admin, caller));
                 }
                 
                 // Find the member to update and check permissions first
@@ -411,8 +412,9 @@ pub fn update_member_event(request: UpdateEventRequest) -> Result<FamilyEvent, S
         match families.get(&request.family_id) {
             Some(mut family) => {
                 // Check if caller is admin or event creator
+                ic_cdk::println!("DEBUG UPDATE EVENT: Family admin: {:?}, Caller: {:?}", family.admin, caller);
                 if family.admin != caller {
-                    return Err("Only family admin can update events".to_string());
+                    return Err(format!("Only family admin can update events. Admin: {:?}, Caller: {:?}", family.admin, caller));
                 }
                 
                 // Find the member first

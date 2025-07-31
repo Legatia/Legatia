@@ -411,3 +411,46 @@ src/Legatia_new_frontend_react/package-lock.json.bak
 .env.production.local
 .env.test.local
 .dfx/network/local/canister_ids.json.bak
+
+# Test scripts and development utilities
+test_*.js
+test_*.ts
+test-*.js
+test-*.ts
+debug_*.js
+debug_*.ts
+
+# Temporary test files created during development
+test_ghost_edit.js
+test_edit_route.js
+test_backend_*.js
+test_frontend_*.js
+verification_*.js
+manual_test_*.js
+
+# Debug and temporary development files
+debug.log
+debug-*.log
+temp_test_*
+temp_debug_*
+*.test.tmp
+*.debug.tmp
+
+# Console output captures
+console_*.log
+browser_console_*.txt
+debug_output_*.txt
+
+# Development artifacts from ghost profile editing work
+ghost_profile_test_*
+edit_member_test_*
+admin_permission_test_*
+candid_interface_backup_*
+
+# Additional development and testing files
+mock_*.js
+mock_*.ts
+stub_*.js
+stub_*.ts
+fixture_*.js
+fixture_*.ts

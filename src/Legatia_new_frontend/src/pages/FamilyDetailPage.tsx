@@ -26,7 +26,7 @@ import toast from 'react-hot-toast';
 export const FamilyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, principal } = useAuth();
   const { 
     currentFamily, 
     loading, 
@@ -112,7 +112,7 @@ export const FamilyDetailPage: React.FC = () => {
 
   if (!currentFamily) return null;
 
-  const isAdmin = currentFamily.admin.toString() === user?.id;
+  const isAdmin = principal && currentFamily.admin.toString() === principal.toString();
 
   return (
     <div className="space-y-6">
@@ -293,20 +293,30 @@ export const FamilyDetailPage: React.FC = () => {
                             </Link>
                           </Button>
                         )}
-                        {isAdmin && (
+                        {/* Edit button for ghost profiles (admin only) */}
+                        {isAdmin && (!member.profile_principal || member.profile_principal.length === 0) ? (
                           <Button 
                             size="sm" 
-                            variant={(!member.profile_principal || member.profile_principal.length === 0) ? "secondary" : "outline"}
+                            variant="secondary"
                             className="text-xs h-7"
                             asChild
-                            disabled={member.profile_principal && member.profile_principal.length > 0}
                           >
                             <Link to={`/family/${currentFamily.id}/member/${member.id}/edit`}>
                               <Edit className="mr-1 h-3 w-3" />
-                              {(!member.profile_principal || member.profile_principal.length === 0) ? "Edit" : "Linked"}
+                              Edit Ghost
                             </Link>
                           </Button>
-                        )}
+                        ) : member.profile_principal && member.profile_principal.length > 0 ? (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="text-xs h-7"
+                            disabled
+                          >
+                            <Edit className="mr-1 h-3 w-3" />
+                            Linked Profile
+                          </Button>
+                        ) : null}
                       </div>
                     </div>
                   </div>
