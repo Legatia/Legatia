@@ -22,7 +22,7 @@ import toast from 'react-hot-toast';
 export const ViewEventsPage: React.FC = () => {
   const { id: familyId, memberId } = useParams<{ id: string; memberId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, actor } = useAuth();
   const { currentFamily, loading, error, fetchFamily, clearError } = useFamily();
   const [events, setEvents] = useState<FamilyEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
@@ -43,11 +43,37 @@ export const ViewEventsPage: React.FC = () => {
 
   const currentMember = currentFamily?.members?.find(m => m.id === memberId);
 
+  // Fetch events from API instead of using cached data
   useEffect(() => {
-    if (currentMember) {
-      setEvents(currentMember.events || []);
-    }
-  }, [currentMember]);
+    const fetchEvents = async () => {
+      if (!familyId || !memberId || !actor) return;
+      
+      setLoadingEvents(true);
+      try {
+        const result = await actor.get_member_events_chronological(familyId, memberId);
+        if ('Ok' in result) {
+          setEvents(result.Ok);
+        } else {
+          toast.error(`Failed to load events: ${result.Err}`);
+          // Fallback to cached events if API fails
+          if (currentMember) {
+            setEvents(currentMember.events || []);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        toast.error('Failed to load events');
+        // Fallback to cached events if API fails
+        if (currentMember) {
+          setEvents(currentMember.events || []);
+        }
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+
+    fetchEvents();
+  }, [familyId, memberId, actor, currentMember]);
 
   const formatEventDate = (dateString: string): string => {
     if (!dateString) return '';
@@ -111,6 +137,14 @@ export const ViewEventsPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" text="Loading family..." />
+      </div>
+    );
+  }
+
+  if (loadingEvents && events.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner size="lg" text="Loading events..." />
       </div>
     );
   }

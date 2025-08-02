@@ -93,6 +93,29 @@ type AddEventRequest = record {
   event_type : text;
 };
 
+type UpdateFamilyMemberRequest = record {
+  family_id : text;
+  member_id : text;
+  full_name : opt text;
+  surname_at_birth : opt text;
+  sex : opt text;
+  birthday : opt text;
+  birth_city : opt text;
+  birth_country : opt text;
+  death_date : opt text;
+  relationship_to_admin : opt text;
+};
+
+type UpdateEventRequest = record {
+  family_id : text;
+  member_id : text;
+  event_id : text;
+  title : opt text;
+  description : opt text;
+  event_date : opt text;
+  event_type : opt text;
+};
+
 type ProfileResult = variant { Ok : UserProfile; Err : text };
 type FamilyResult = variant { Ok : Family; Err : text };
 type FamilyListResult = variant { Ok : vec Family; Err : text };
@@ -221,8 +244,10 @@ service : {
   
   add_family_member : (AddFamilyMemberRequest) -> (FamilyMemberResult);
   remove_family_member : (text, text) -> (StringResult);
+  update_family_member : (UpdateFamilyMemberRequest) -> (FamilyMemberResult);
   
   add_member_event : (AddEventRequest) -> (FamilyEventResult);
+  update_member_event : (UpdateEventRequest) -> (FamilyEventResult);
   get_member_events_chronological : (text, text) -> (FamilyEventsResult) query;
   
   find_matching_ghost_profiles : () -> (GhostProfileMatchResult) query;

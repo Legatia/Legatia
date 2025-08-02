@@ -2,11 +2,11 @@ use candid::Principal;
 use ic_cdk::api;
 use ic_cdk_macros::*;
 
-use crate::types::{
+use crate::core::types::{
     Family, FamilyMember, FamilyEvent, CreateFamilyRequest, AddFamilyMemberRequest, 
     AddEventRequest, UpdateFamilyMemberRequest, UpdateEventRequest, DEV_MODE
 };
-use crate::storage::{PROFILES, FAMILIES, USER_FAMILIES, generate_id};
+use crate::core::storage::{PROFILES, FAMILIES, USER_FAMILIES, generate_id};
 
 #[update]
 pub fn create_family(request: CreateFamilyRequest) -> Result<Family, String> {
@@ -17,10 +17,10 @@ pub fn create_family(request: CreateFamilyRequest) -> Result<Family, String> {
     }
 
     // Validate input fields
-    if let Err(_) = crate::validation::validate_name(&request.name, "family_name") {
+    if let Err(_) = crate::core::validation::validate_name(&request.name, "family_name") {
         return Err("Invalid family name format".to_string());
     }
-    if let Err(_) = crate::validation::validate_description(&request.description) {
+    if let Err(_) = crate::core::validation::validate_description(&request.description) {
         return Err("Invalid description format".to_string());
     }
 
@@ -328,7 +328,6 @@ pub fn generate_member_id() -> String {
     format!("member_{}", api::time())
 }
 
-#[update]
 pub fn update_family_member(request: UpdateFamilyMemberRequest) -> Result<FamilyMember, String> {
     let caller = api::caller();
     
@@ -397,7 +396,6 @@ pub fn update_family_member(request: UpdateFamilyMemberRequest) -> Result<Family
     })
 }
 
-#[update]
 pub fn update_member_event(request: UpdateEventRequest) -> Result<FamilyEvent, String> {
     let caller = api::caller();
     

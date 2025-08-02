@@ -2,9 +2,9 @@ use candid::Principal;
 use ic_cdk::api;
 use ic_cdk_macros::*;
 
-use crate::types::{UserProfile, CreateProfileRequest, UpdateProfileRequest, GhostProfileMatch, DEV_MODE};
-use crate::storage::PROFILES;
-use crate::ghost::find_matching_ghost_profiles;
+use crate::core::types::{UserProfile, CreateProfileRequest, UpdateProfileRequest, GhostProfileMatch, DEV_MODE};
+use crate::core::storage::PROFILES;
+use crate::social::ghost::find_matching_ghost_profiles;
 
 #[update]
 pub fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, String> {
@@ -15,16 +15,16 @@ pub fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, Stri
     }
 
     // Validate input fields
-    if let Err(_) = crate::validation::validate_name(&request.full_name, "full_name") {
+    if let Err(_) = crate::core::validation::validate_name(&request.full_name, "full_name") {
         return Err("Invalid full name format".to_string());
     }
-    if let Err(_) = crate::validation::validate_name(&request.surname_at_birth, "surname_at_birth") {
+    if let Err(_) = crate::core::validation::validate_name(&request.surname_at_birth, "surname_at_birth") {
         return Err("Invalid surname format".to_string());
     }
-    if let Err(_) = crate::validation::validate_name(&request.birth_city, "birth_city") {
+    if let Err(_) = crate::core::validation::validate_name(&request.birth_city, "birth_city") {
         return Err("Invalid birth city format".to_string());
     }
-    if let Err(_) = crate::validation::validate_name(&request.birth_country, "birth_country") {
+    if let Err(_) = crate::core::validation::validate_name(&request.birth_country, "birth_country") {
         return Err("Invalid birth country format".to_string());
     }
 
@@ -53,7 +53,7 @@ pub fn create_profile(request: CreateProfileRequest) -> Result<UserProfile, Stri
         profiles.insert(caller, profile.clone());
         
         // Update search index
-        crate::invitations::update_user_search_index(&profile, caller);
+        crate::social::invitations::update_user_search_index(&profile, caller);
         
         Ok(profile)
     })
@@ -95,7 +95,7 @@ pub fn update_profile(request: UpdateProfileRequest) -> Result<UserProfile, Stri
                 profiles.insert(caller, profile.clone());
                 
                 // Update search index
-                crate::invitations::update_user_search_index(&profile, caller);
+                crate::social::invitations::update_user_search_index(&profile, caller);
                 
                 Ok(profile)
             }
@@ -232,8 +232,8 @@ pub fn get_profile_internal(principal: Principal) -> Result<UserProfile, String>
 }
 
 pub fn add_user_to_family(principal: Principal, family_id: String) -> Result<(), String> {
-    use crate::storage::USER_FAMILIES;
-    use crate::types::UserFamilyList;
+    use crate::core::storage::USER_FAMILIES;
+    use crate::core::types::UserFamilyList;
     
     USER_FAMILIES.with(|user_families| {
         let mut user_families = user_families.borrow_mut();

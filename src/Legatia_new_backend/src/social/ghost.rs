@@ -2,11 +2,11 @@ use candid::Principal;
 use ic_cdk::api;
 use ic_cdk_macros::*;
 
-use crate::types::{
+use crate::core::types::{
     UserProfile, FamilyMember, GhostProfileMatch, ClaimRequest, ClaimStatus, 
     ProcessClaimRequest, DEV_MODE
 };
-use crate::storage::{PROFILES, FAMILIES, USER_FAMILIES, CLAIM_REQUESTS, generate_id};
+use crate::core::storage::{PROFILES, FAMILIES, USER_FAMILIES, CLAIM_REQUESTS, generate_id};
 
 // Helper function to calculate similarity between profiles
 fn calculate_similarity(user_profile: &UserProfile, ghost_member: &FamilyMember) -> u8 {

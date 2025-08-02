@@ -22,7 +22,7 @@ const addEventSchema = z.object({
 
 type AddEventFormData = z.infer<typeof addEventSchema>;
 
-export const AddEventPage: React.FC = () => {
+const AddEventPage: React.FC = () => {
   const { id: familyId, memberId } = useParams<{ id: string; memberId: string }>();
   const navigate = useNavigate();
   const { currentFamily, loading, error, addMemberEvent, fetchFamily, clearError } = useFamily();
@@ -256,3 +256,5 @@ export const AddEventPage: React.FC = () => {
     </div>
   );
 };
+
+export default AddEventPage;

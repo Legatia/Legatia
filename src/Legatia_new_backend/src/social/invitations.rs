@@ -2,10 +2,8 @@ use ic_cdk::api;
 use candid::{Principal};
 use ic_stable_structures::StableBTreeMap;
 use std::cell::RefCell;
-use crate::types::*;
-use crate::MEMORY_MANAGER;
-
-use crate::storage::Memory;
+use crate::core::types::*;
+use crate::core::storage::{MEMORY_MANAGER, Memory};
 
 // Thread-local storage for invitations and notifications
 thread_local! {
@@ -81,7 +79,7 @@ pub fn update_user_search_index(profile: &UserProfile, principal: Principal) {
 
 pub fn search_users(query: String) -> Result<Vec<UserSearchResult>, String> {
     // Validate search query
-    if let Err(_validation_error) = crate::validation::validate_search_query(&query) {
+    if let Err(_validation_error) = crate::core::validation::validate_search_query(&query) {
         return Err("Invalid search query format".to_string());
     }
     
@@ -164,7 +162,7 @@ pub fn send_family_invitation(request: SendInvitationRequest) -> Result<String, 
     }
     
     // Get inviter profile for name
-    let inviter_profile = crate::profile::get_profile_internal(caller)?;
+    let inviter_profile = crate::user::profile::get_profile_internal(caller)?;
     
     // Create invitation
     let invitation_id = generate_id("invitation");
@@ -233,10 +231,10 @@ pub fn process_family_invitation(request: ProcessInvitationRequest) -> Result<St
         invitation.status = InvitationStatus::Accepted;
         
         // Get user profile
-        let user_profile = crate::profile::get_profile_internal(caller)?;
+        let user_profile = crate::user::profile::get_profile_internal(caller)?;
         
         // Add user to family as a linked member
-        let add_request = crate::types::AddFamilyMemberRequest {
+        let add_request = crate::core::types::AddFamilyMemberRequest {
             family_id: invitation.family_id.clone(),
             full_name: user_profile.full_name.clone(),
             surname_at_birth: user_profile.surname_at_birth.clone(),
@@ -275,7 +273,7 @@ pub fn process_family_invitation(request: ProcessInvitationRequest) -> Result<St
         crate::family::update_family_internal(family)?;
         
         // Update user's family list
-        crate::profile::add_user_to_family(caller, invitation.family_id.clone())?;
+        crate::user::profile::add_user_to_family(caller, invitation.family_id.clone())?;
         
         // Notify family admin of acceptance
         create_notification(
@@ -293,7 +291,7 @@ pub fn process_family_invitation(request: ProcessInvitationRequest) -> Result<St
         invitation.status = InvitationStatus::Declined;
         
         // Notify family admin of decline
-        let user_profile = crate::profile::get_profile_internal(caller)?;
+        let user_profile = crate::user::profile::get_profile_internal(caller)?;
         create_notification(
             invitation.inviter,
             "Family invitation declined".to_string(),

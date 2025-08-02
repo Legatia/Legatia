@@ -13,7 +13,7 @@ interface FamilyCardProps {
   className?: string;
 }
 
-export const FamilyCard: React.FC<FamilyCardProps> = ({ family, className }) => {
+export const FamilyCard: React.FC<FamilyCardProps> = React.memo(({ family, className }) => {
   const formatDate = (timestamp: bigint): string => {
     try {
       return format(new Date(Number(timestamp) / 1000000), 'MMM d, yyyy');
@@ -105,4 +105,4 @@ export const FamilyCard: React.FC<FamilyCardProps> = ({ family, className }) => 
       </CardContent>
     </Card>
   );
-};
+});

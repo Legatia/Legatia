@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
 
-use crate::types::{UserProfile, Family, UserFamilyList, ClaimRequest, FamilyInvitation, Notification, UserSearchResult};
+use crate::core::types::{UserProfile, Family, UserFamilyList, ClaimRequest, FamilyInvitation, Notification, UserSearchResult};
 
 pub type Memory = VirtualMemory<DefaultMemoryImpl>;
 

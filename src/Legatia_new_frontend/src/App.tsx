@@ -1,28 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoadingSpinner } from './components/layout/LoadingSpinner';
 import { useAuth } from './hooks/useAuth';
 
-// Pages
+// Critical pages (not lazy loaded)
 import { LoginPage } from './pages/LoginPage';
 import { CreateProfilePage } from './pages/CreateProfilePage';
-import { ProfilePage } from './pages/ProfilePage';
 import { FamiliesPage } from './pages/FamiliesPage';
-import { CreateFamilyPage } from './pages/CreateFamilyPage';
-import { FamilyDetailPage } from './pages/FamilyDetailPage';
-import { AddFamilyMemberPage } from './pages/AddFamilyMemberPage';
-import { AddEventPage } from './pages/AddEventPage';
-import { ViewEventsPage } from './pages/ViewEventsPage';
-import { EditFamilyMemberPage } from './pages/EditFamilyMemberPage';
-import { EditEventPage } from './pages/EditEventPage';
+
+// Lazy loaded pages
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const CreateFamilyPage = lazy(() => import('./pages/CreateFamilyPage').then(m => ({ default: m.CreateFamilyPage })));
+const FamilyDetailPage = lazy(() => import('./pages/FamilyDetailPage').then(m => ({ default: m.FamilyDetailPage })));
+const AddFamilyMemberPage = lazy(() => import('./pages/AddFamilyMemberPage').then(m => ({ default: m.AddFamilyMemberPage })));
+const AddEventPage = lazy(() => import('./pages/AddEventPage'));
+const ViewEventsPage = lazy(() => import('./pages/ViewEventsPage').then(m => ({ default: m.ViewEventsPage })));
+const EditFamilyMemberPage = lazy(() => import('./pages/EditFamilyMemberPage').then(m => ({ default: m.EditFamilyMemberPage })));
+const EditEventPage = lazy(() => import('./pages/EditEventPage').then(m => ({ default: m.EditEventPage })));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const InvitationsPage = lazy(() => import('./pages/InvitationsPage').then(m => ({ default: m.InvitationsPage })));
+const UserSearchPage = lazy(() => import('./pages/UserSearchPage').then(m => ({ default: m.UserSearchPage })));
+const SendInvitationPage = lazy(() => import('./pages/SendInvitationPage').then(m => ({ default: m.SendInvitationPage })));
+const GhostClaimsPage = lazy(() => import('./pages/GhostClaimsPage').then(m => ({ default: m.GhostClaimsPage })));
+const AdminClaimsPage = lazy(() => import('./pages/AdminClaimsPage').then(m => ({ default: m.AdminClaimsPage })));
 
 // Placeholder pages for features not yet implemented
-const NotificationsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Notifications</h2><p className="text-muted-foreground">Coming soon...</p></div>;
-const InvitationsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Invitations</h2><p className="text-muted-foreground">Coming soon...</p></div>;
-const SearchPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Search Users</h2><p className="text-muted-foreground">Coming soon...</p></div>;
 const SettingsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Settings</h2><p className="text-muted-foreground">Coming soon...</p></div>;
+
+// Helper component for lazy loaded routes
+const LazyRoute: React.FC<{ children: React.ReactNode; requiresProfile?: boolean }> = ({ 
+  children, 
+  requiresProfile = true 
+}) => (
+  <ProtectedRoute requiresProfile={requiresProfile}>
+    <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." />}>
+      {children}
+    </Suspense>
+  </ProtectedRoute>
+);
 
 function App() {
   const { init, loading } = useAuth();
@@ -64,9 +81,9 @@ function App() {
           <Route 
             path="/profile" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <ProfilePage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
@@ -82,27 +99,27 @@ function App() {
           <Route 
             path="/create-family" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <CreateFamilyPage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
           <Route 
             path="/family/:id" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <FamilyDetailPage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
           <Route 
             path="/family/:id/add-member" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <AddFamilyMemberPage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
@@ -145,26 +162,53 @@ function App() {
           <Route 
             path="/notifications" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <NotificationsPage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
           <Route 
             path="/invitations" 
             element={
-              <ProtectedRoute requiresProfile>
+              <LazyRoute>
                 <InvitationsPage />
-              </ProtectedRoute>
+              </LazyRoute>
             } 
           />
           
           <Route 
             path="/search" 
             element={
+              <LazyRoute>
+                <UserSearchPage />
+              </LazyRoute>
+            } 
+          />
+          
+          <Route 
+            path="/family/:familyId/invite" 
+            element={
               <ProtectedRoute requiresProfile>
-                <SearchPage />
+                <SendInvitationPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/ghost-claims" 
+            element={
+              <ProtectedRoute requiresProfile>
+                <GhostClaimsPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin-claims" 
+            element={
+              <ProtectedRoute requiresProfile>
+                <AdminClaimsPage />
               </ProtectedRoute>
             } 
           />
