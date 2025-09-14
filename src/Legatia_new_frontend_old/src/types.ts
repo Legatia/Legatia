@@ -184,7 +184,7 @@ export interface UserSearchMatch {
   id: string;
   full_name: string;
   surname_at_birth: string;
-  principal: Principal;
+  user_principal: Principal;
 }
 
 export type UserSearchResult = { Ok: UserSearchMatch[] } | { Err: string };

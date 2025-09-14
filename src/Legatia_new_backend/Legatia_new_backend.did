@@ -1,4 +1,5 @@
 type UserProfile = record {
+  id : text;
   full_name : text;
   surname_at_birth : text;
   sex : text;
@@ -137,6 +138,75 @@ type ClaimRequestResult = variant { Ok : ClaimRequest; Err : text };
 type ClaimRequestsResult = variant { Ok : vec ClaimRequest; Err : text };
 type ProfileWithGhostResult = variant { Ok : record { UserProfile; vec GhostProfileMatch }; Err : text };
 
+// User Search Types
+type UserSearchResult = record {
+  id : text;
+  full_name : text;
+  surname_at_birth : text;
+  user_principal : principal;
+};
+
+type UserSearchResultList = variant { Ok : vec UserSearchResult; Err : text };
+
+// Family Invitation Types
+type InvitationStatus = variant {
+  Pending;
+  Accepted;
+  Declined;
+  Expired;
+};
+
+type FamilyInvitation = record {
+  id : text;
+  family_id : text;
+  family_name : text;
+  inviter : principal;
+  inviter_name : text;
+  invitee : principal;
+  invitee_id : text;
+  message : opt text;
+  created_at : nat64;
+  status : InvitationStatus;
+  relationship_to_admin : text;
+};
+
+type SendInvitationRequest = record {
+  user_id : text;
+  family_id : text;
+  message : opt text;
+  relationship_to_admin : text;
+};
+
+type ProcessInvitationRequest = record {
+  invitation_id : text;
+  accept : bool;
+};
+
+type FamilyInvitationsResult = variant { Ok : vec FamilyInvitation; Err : text };
+
+// Notification Types
+type NotificationType = variant {
+  FamilyInvitation;
+  GhostProfileClaim;
+  FamilyUpdate;
+  SystemAlert;
+};
+
+type Notification = record {
+  id : text;
+  recipient : principal;
+  title : text;
+  message : text;
+  notification_type : NotificationType;
+  created_at : nat64;
+  read : bool;
+  action_url : opt text;
+  metadata : opt text;
+};
+
+type NotificationsResult = variant { Ok : vec Notification; Err : text };
+type UnreadCountResult = variant { Ok : nat64; Err : text };
+
 service : {
   create_profile : (CreateProfileRequest) -> (ProfileResult);
   update_profile : (UpdateProfileRequest) -> (ProfileResult);
@@ -162,4 +232,20 @@ service : {
   get_my_claim_requests : () -> (ClaimRequestsResult) query;
   
   toggle_family_visibility : (text, bool) -> (StringResult);
+  
+  // User search and invitation functions
+  search_users : (text) -> (UserSearchResultList) query;
+  send_family_invitation : (SendInvitationRequest) -> (StringResult);
+  process_family_invitation : (ProcessInvitationRequest) -> (StringResult);
+  get_my_invitations : () -> (FamilyInvitationsResult) query;
+  get_sent_invitations : () -> (FamilyInvitationsResult) query;
+  
+  // Notification functions
+  get_my_notifications : () -> (NotificationsResult) query;
+  get_unread_notification_count : () -> (UnreadCountResult) query;
+  mark_notification_read : (text) -> (StringResult);
+  mark_all_notifications_read : () -> (StringResult);
+  
+  // Test function
+  test_search_users : (text) -> (variant { Ok : vec text; Err : text }) query;
 }

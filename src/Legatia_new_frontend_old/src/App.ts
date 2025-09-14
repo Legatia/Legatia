@@ -50,9 +50,15 @@ class App {
   private currentFamilyId: string = '';
   private currentFamilyName: string = '';
   private unreadNotificationCount: number = 0;
+  private searchQuery: string = '';
   
   constructor() {
     this.init();
+    // Listen for user search update events
+    document.addEventListener('userSearchUpdate', () => {
+      console.log('Received userSearchUpdate event, re-rendering...');
+      this.render();
+    });
   }
 
   private async init(): Promise<void> {
@@ -467,6 +473,7 @@ class App {
         case 'user-search':
           this.currentFamilyId = data.familyId || '';
           this.currentFamilyName = data.familyName || '';
+          this.searchQuery = ''; // Reset search query when entering search view
           break;
         case 'send-invitation':
           this.currentFamilyId = data.familyId || '';
@@ -663,7 +670,12 @@ class App {
       this.handleViewChange.bind(this),
       () => this.handleViewChange('family-detail', { familyId: this.currentFamilyId }),
       this.currentFamilyId,
-      this.currentFamilyName
+      this.currentFamilyName,
+      this.searchQuery,
+      (newQuery: string) => {
+        this.searchQuery = newQuery;
+        this.render();
+      }
     );
     return userSearch.render();
   }
