@@ -6,6 +6,7 @@ export const useAuth = () => {
     isAuthenticated,
     user,
     principal,
+    actor,
     loading,
     error,
     init,
@@ -23,6 +24,7 @@ export const useAuth = () => {
     isAuthenticated,
     user,
     principal,
+    actor,
     loading,
     error,
     

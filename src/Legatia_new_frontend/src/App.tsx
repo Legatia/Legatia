@@ -17,11 +17,11 @@ import { AddEventPage } from './pages/AddEventPage';
 import { ViewEventsPage } from './pages/ViewEventsPage';
 import { EditFamilyMemberPage } from './pages/EditFamilyMemberPage';
 import { EditEventPage } from './pages/EditEventPage';
+import { NotificationsPage } from './pages/NotificationsPage';
+import { InvitationsPage } from './pages/InvitationsPage';
+import { UserSearchPage } from './pages/UserSearchPage';
 
 // Placeholder pages for features not yet implemented
-const NotificationsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Notifications</h2><p className="text-muted-foreground">Coming soon...</p></div>;
-const InvitationsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Invitations</h2><p className="text-muted-foreground">Coming soon...</p></div>;
-const SearchPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Search Users</h2><p className="text-muted-foreground">Coming soon...</p></div>;
 const SettingsPage = () => <div className="text-center py-12"><h2 className="text-2xl font-bold">Settings</h2><p className="text-muted-foreground">Coming soon...</p></div>;
 
 function App() {
@@ -164,7 +164,7 @@ function App() {
             path="/search" 
             element={
               <ProtectedRoute requiresProfile>
-                <SearchPage />
+                <UserSearchPage />
               </ProtectedRoute>
             } 
           />
